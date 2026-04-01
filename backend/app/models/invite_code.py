@@ -1,15 +1,16 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, func, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.sql import func
 
 from app.db.base import Base
 
 
-class User(Base):
-    __tablename__ = "users"
+class InviteCode(Base):
+    __tablename__ = "invite_codes"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -17,38 +18,25 @@ class User(Base):
         default=uuid.uuid4
     )
 
-    telegram_id: Mapped[str] = mapped_column(
-        String,
-        unique=True,
-        nullable=False,
-        index=True
-    )
-
-    first_name: Mapped[str] = mapped_column(
-        String,
-        nullable=True
-    )
+    code: Mapped[str] = mapped_column(String, unique=True, index=True)
 
     church_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("churches.id")
     )
 
-    role: Mapped[str] = mapped_column(
-        String,
-        default="guest" # member, prayer_team, admin
-    )
+    is_active: Mapped[bool] = mapped_column(default=True)
+
+    expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
         server_default=func.now()
     )
 
     modified_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
         server_default=func.now(),
         onupdate=func.now()
     )
 
     def __repr__(self) -> str:
-        return f'<User {self.telegram_id}>'
+        return f'<InviteCode {self.code} for Church {self.church_id.name}>'
