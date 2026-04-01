@@ -31,3 +31,6 @@ db_current:
 
 db_sql:
 	uv run alembic upgrade $(x):$(y) --sql > $(z)
+
+polling:
+	uv run python -m app.bot.polling
