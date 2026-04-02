@@ -1,6 +1,8 @@
 import uuid
 from pydantic import BaseModel, ConfigDict
 
+from app.core.schemas.membership import Membership
+
 class UserBase(BaseModel):
     telegram_id: str
     first_name: str | None = None
@@ -12,7 +14,6 @@ class InviteUserCreate(UserBase):
 
 class User(UserBase):
     id: uuid.UUID
-    church_id: uuid.UUID
-    role: str
+    memberships: list[Membership]
 
     model_config = ConfigDict(from_attributes=True)

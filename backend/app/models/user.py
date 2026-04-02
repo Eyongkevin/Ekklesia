@@ -3,7 +3,7 @@ from datetime import datetime
 
 from sqlalchemy import String, DateTime, func, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
@@ -29,16 +29,6 @@ class User(Base):
         nullable=True
     )
 
-    church_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
-        ForeignKey("churches.id")
-    )
-
-    role: Mapped[str] = mapped_column(
-        String,
-        default="guest" # member, prayer_team, admin
-    )
-
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now()
@@ -49,6 +39,8 @@ class User(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
+
+    memberships = relationship("Membership", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f'<User {self.telegram_id}>'
