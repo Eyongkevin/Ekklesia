@@ -1,6 +1,8 @@
 """Welcome to Reflex! This file outlines the steps to create a basic app."""
 
 import reflex as rx
+from app.pages.church import church_page
+from app.pages.invite import invite_page
 
 from rxconfig import config
 
@@ -34,3 +36,5 @@ def index() -> rx.Component:
 
 app = rx.App()
 app.add_page(index)
+app.add_page(church_page, route="/churches", title="Church Management")
+app.add_page(invite_page, route="/invites", title="Invite Management")

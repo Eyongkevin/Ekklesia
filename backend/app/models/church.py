@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import String, func, DateTime
 
@@ -31,6 +31,8 @@ class Church(Base):
         server_default=func.now(),
         onupdate=func.now()
     )
+
+    memberships = relationship("Membership", back_populates="church", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f'<Church {self.name}>'

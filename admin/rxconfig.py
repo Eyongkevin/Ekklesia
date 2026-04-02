@@ -1,7 +1,7 @@
 import reflex as rx
 
 config = rx.Config(
-    app_name="admin",
+    app_name="app",
     plugins=[
         rx.plugins.SitemapPlugin(),
         rx.plugins.TailwindV4Plugin(),
