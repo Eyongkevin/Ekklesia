@@ -20,6 +20,7 @@ ekklesia/
 │   │   ├── core/              # Config, security
 │   │   │   ├── config.py
 │   │   │   ├── security.py
+│   │   │   ├── schemas/       # Pydantic schemas
 │   │   │
 │   │   ├── db/                # Database setup
 │   │   │   ├── base.py
@@ -30,10 +31,6 @@ ekklesia/
 │   │   │   ├── church.py
 │   │   │   ├── sermon.py
 │   │   │   ├── prayer.py
-│   │   │
-│   │   ├── schemas/           # Pydantic schemas
-│   │   │   ├── user.py
-│   │   │   ├── sermon.py
 │   │   │
 │   │   ├── crud/              # DB queries
 │   │   │   ├── user.py
@@ -96,32 +93,9 @@ ekklesia/
 | Layer    | Responsibility   |
 | -------- | ---------------- |
 | FastAPI  | Logic, DB, APIs  |
-| Reflex   | UI only          |
-| Telegram | User interaction |
+| Reflex   | Admin UI only          |
+| Telegram | User UI interaction |
 
-### 2. 🔄 Reflex Talks to Backend via API
-Inside reflex
-```py
-# admin/app/services/api_client.py
-
-import httpx
-
-BASE_URL = "http://localhost:8000/api/v1"
-
-def get_sermons():
-    return httpx.get(f"{BASE_URL}/sermons").json()
-```
-
-### 3. 🤖 Telegram Talks to FastAPI
-Webhook:
-```py
-# backend/app/bot/webhook.py
-
-@router.post("/webhook")
-async def telegram_webhook(update: dict):
-    # process update
-    handle_update(update)
-```
 
 ## 🔹 🔌 How Everything Connects
 ### Flow 1: Telegram User
@@ -149,9 +123,3 @@ ekklesia/
     - Deploy Reflex separately (Reflex hosting, Vercel)
 - DB:
     - Shared PostgreSQL (Supabase / Neon)
-
-
-
-Initialize the monorepo structure properly
-Set up uv + workspace workflow
-Or scaffold backend + reflex apps together
