@@ -1,15 +1,21 @@
 import random
 import string
-from sqlalchemy.orm import Session
-from app.crud.invite import create_invite_code
+from app.crud.invite import InviteCRUD
+from app.db.uow import UnitOfWork
 
 class InviteService:
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
+        self.invite_crud = InviteCRUD(self.uow.db)
+
     @staticmethod
     def generate_code(length: int = 6) -> str:
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
-    @staticmethod
-    def create_invite(db: Session, church_id: str):
+    def create_invite(self, church_id: str):
         code: str = InviteService.generate_code()
-        return create_invite_code(db, code, church_id)
+        return self.invite_crud.create_invite_code(code, church_id)
+    
+    def validate_invite_code(self, code: str):
+        return self.invite_crud.get_active_invite_by_code(code)
 

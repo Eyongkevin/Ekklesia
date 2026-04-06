@@ -17,16 +17,32 @@ class User(Base):
         default=uuid.uuid4
     )
 
+    email: Mapped[str] = mapped_column(
+        String,
+        unique=True,
+        nullable=True,
+        index=True
+    )
+
     telegram_id: Mapped[str] = mapped_column(
         String,
         unique=True,
-        nullable=False,
+        nullable=True,
         index=True
     )
 
     first_name: Mapped[str] = mapped_column(
         String,
         nullable=True
+    )
+
+    password_hash: Mapped[str] = mapped_column(
+        String,
+        nullable=True
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        default=True, server_default="true"
     )
 
     created_at: Mapped[datetime] = mapped_column(

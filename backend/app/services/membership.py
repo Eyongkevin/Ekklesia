@@ -1,10 +1,19 @@
-from sqlalchemy.orm import Session
-from app.crud import membership
+from app.crud.membership import MembershipCRUD
 from app.core.schemas import membership as membership_schemas
+from app.db.uow import UnitOfWork
+from app.core.utils import MembershipRole
 
 
-def check_membership(db: Session, user_id: str, church_id: str) -> bool:
-    return membership.check_membership(db, user_id, church_id) is not None
+class MembershipService:
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
+        self.membership_crud = MembershipCRUD(self.uow.db)
 
-def create_membership(db: Session, user_id: str, church_id: str) -> membership_schemas.Membership:
-    return membership.create_membership(db, user_id, church_id)
+    def check_membership(self, user_id: str, church_id: str) -> bool:
+        return self.membership_crud.check_membership(user_id, church_id) is not None
+
+    def create_membership(self, user_id: str, role: MembershipRole, church_id: str | None = None) -> membership_schemas.Membership:
+        return self.membership_crud.create_membership(user_id, role, church_id)
+
+    def check_is_super_admin(self, user_id: str) -> bool:
+        return self.membership_crud.is_super_admin(user_id)

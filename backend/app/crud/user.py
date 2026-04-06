@@ -2,17 +2,29 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.core.schemas import user as user_schemas
 
-def get_user_by_telegram_id(db: Session, telegram_id: str) -> user_schemas.User | None:
-    user = db.query(User).filter(User.telegram_id == telegram_id).first()
-    return user_schemas.User.model_validate(user) if user else None
+class UserCRUD:
+    def __init__(self, db: Session):
+        self.db = db
 
-def create_user(db: Session, telegram_id: str, first_name: str | None, church_id: str) -> user_schemas.User:
-    new_user = User(
-        telegram_id=telegram_id,
-        first_name=first_name,
-        church_id=church_id
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return user_schemas.User.model_validate(new_user)
+    def get_user_by_telegram_id(self, telegram_id: str) -> user_schemas.User | None:
+        user = self.db.query(User).filter(User.telegram_id == telegram_id).first()
+        return user_schemas.User.model_validate(user) if user else None
+
+    def get_user_by_email(self, email: str) -> user_schemas.User | None:
+        user = self.db.query(User).filter_by(email=email).first()
+        return user_schemas.User.model_validate(user) if user else None
+    
+    def get_user_by_id(self, user_id: str) -> user_schemas.User | None:
+        user = self.db.query(User).filter_by(id=user_id).first()
+        return user_schemas.User.model_validate(user) if user else None
+
+    def create_user(self, telegram_id: str | None = None, first_name: str | None = None, email: str | None = None, password: str | None = None) -> user_schemas.User:
+        new_user = User(
+            telegram_id=telegram_id,
+            first_name=first_name,
+            email=email,
+            password_hash=password
+        )
+        self.db.add(new_user)
+        self.db.flush()
+        return user_schemas.User.model_validate(new_user)
