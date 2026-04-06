@@ -21,6 +21,17 @@ class Church(Base):
         unique=True, 
         nullable=False)
 
+    code: Mapped[str] = mapped_column(
+        String,
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        default=True
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now()

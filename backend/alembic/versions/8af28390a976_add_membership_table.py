@@ -29,7 +29,7 @@ def upgrade() -> None:
     sa.Column('modified_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['church_id'], ['churches.id'], name=op.f('fk_memberships_church_id_churches')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_memberships_user_id_users')),
-    sa.PrimaryKeyConstraint('user_id', 'church_id', name=op.f('pk_memberships'))
+    # sa.PrimaryKeyConstraint('user_id', 'church_id', name=op.f('pk_memberships'))
     )
     # ### end Alembic commands ###
 

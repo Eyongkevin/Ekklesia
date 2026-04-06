@@ -1,20 +1,20 @@
-from sqlalchemy.orm import Session
-
-from app.crud.church import create_church, get_church_by_id, get_churches
-from app.core.schemas.church import Church, ChurchCreate
+from app.crud.church import ChurchCRUD
+from app.db.uow import UnitOfWork
+from app.core.schemas.church import Church
 
 
 
 class ChurchService:
-    @staticmethod
-    def create_church(db: Session, name: str) -> Church:
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
+        self.church_crud = ChurchCRUD(self.uow.db)
+
+    def create_church(self, name: str) -> Church:
         # return dict(id=1, name='Test Church')
-        return create_church(db, name)
+        return self.church_crud.create_church(name)
     
-    @staticmethod
-    def get_church_by_id(db: Session, church_id: str) -> Church:
-        return get_church_by_id(db, church_id)
-    
-    @staticmethod
-    def get_churches(db: Session) -> list[Church]:
-        return get_churches(db)
+    def get_church_by_id(self, church_id: str) -> Church:
+        return self.church_crud.get_church_by_id(church_id)
+
+    def get_churches(self) -> list[Church]:
+        return self.church_crud.get_churches()

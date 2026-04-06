@@ -1,12 +1,12 @@
 dev:
 	uv run uvicorn app.main:app --host 0.0.0.0 --port 8002 --workers 1 --reload
 
-# make db_migrate m="<message>"
+# make db_auto_migrate m="<message>"
 db_auto_migrate:
 	uv run alembic revision -m "$(m)" --autogenerate
 
-db_migrate:
-	uv run alembic revision -m "$(m)"
+# db_migrate:
+# 	uv run alembic revision -m "$(m)"
 
 db_upgrade_one:
 	uv run alembic upgrade head
