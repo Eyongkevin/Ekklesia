@@ -59,4 +59,4 @@ class User(Base):
     memberships = relationship("Membership", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
-        return f'<User {self.telegram_id}>'
+        return f'{self.first_name} ({self.email})'

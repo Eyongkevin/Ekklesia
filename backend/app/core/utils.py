@@ -2,6 +2,7 @@ from http.client import HTTPException
 from enum import Enum
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from datetime import datetime
 
 from app.core.schemas.membership import Membership
 
@@ -28,3 +29,8 @@ def verify_password(password: str, hashed: str):
 
 def hash_password(password: str):
     return password_hasher.hash(password)
+
+def format_datetime(dt: datetime) -> str:
+    if dt is None:
+        return "N/A"
+    return dt.strftime("%A, %d %B %Y at %I:%M %p")

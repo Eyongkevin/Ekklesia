@@ -54,4 +54,4 @@ class Membership(Base):
     )
 
     def __repr__(self) -> str:
-        return f'<Membership user_id={self.user_id} church_id={self.church_id} role={self.role}>'
+        return f'<Membership role={self.role}, is_active={self.is_active}>'
