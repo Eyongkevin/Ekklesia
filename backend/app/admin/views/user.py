@@ -4,7 +4,7 @@ from sqladmin import ModelView
 from sqlalchemy.orm import joinedload
 from sqladmin.filters import BooleanFilter
 from wtforms import PasswordField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 from app.models import User
 from app.models import Membership
@@ -20,7 +20,7 @@ def get_church(user) -> str:
 def get_role(user):
     if user.memberships:
         membership = user.memberships[0]
-        return membership.role
+        return membership.role.replace("_", " ").title()
     return "N/A"
 
 
@@ -60,11 +60,11 @@ class UserAdmin(ModelView, model=User):
         "is_active": {
             "checked": True
         },
-        "password": {
-            "placeholder": "Enter password",
-        },
         "first_name": {
             "placeholder": "Enter first name",
+        },
+        "password": {
+            "value": ""
         },
         "email": {
             "placeholder": "Enter email address",
@@ -77,7 +77,12 @@ class UserAdmin(ModelView, model=User):
         form_class = await super().scaffold_form()
 
         form_class.password = PasswordField(
-            "Password", validators=[DataRequired()]
+            "Password",
+            render_kw={
+                "class": "form-control",
+                "placeholder": "Enter password"
+            },
+            validators=[Optional()]
         )
 
         return form_class
@@ -89,6 +94,9 @@ class UserAdmin(ModelView, model=User):
 
         if password:
             model.password_hash = hash_password(password)
+        else:
+            # ! Remove, if not, an error will occur during update/create without password provided.
+            del form["password"]
 
     def list_query(self, request):
         """Override list_query to filter users based on their memberships and roles."""
