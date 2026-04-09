@@ -21,6 +21,7 @@ class Church(Base):
         unique=True, 
         nullable=False)
 
+    # TODO: Set limit to be 6 characters
     code: Mapped[str] = mapped_column(
         String,
         unique=True,
@@ -46,4 +47,4 @@ class Church(Base):
     memberships = relationship("Membership", back_populates="church", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
-        return f'<Church {self.name}>'
+        return self.name

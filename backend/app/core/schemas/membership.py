@@ -1,10 +1,12 @@
+import uuid
+
 from pydantic import BaseModel, ConfigDict
 
 from app.core.schemas.church import Church
 
 
 class MembershipBase(BaseModel):
-    church_id: str | None = None
+    church_id: uuid.UUID | None = None
     role: str | None = "member"  # member, prayer_team, admin
 
 
