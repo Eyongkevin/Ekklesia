@@ -11,6 +11,7 @@ def setup_admin(app):
         app,
         engine,
         authentication_backend=AdminAuth(secret_key=settings.SECRET_KEY),
+        templates_dir="app/admin/templates"
     )
 
     # Register views

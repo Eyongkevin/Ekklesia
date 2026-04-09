@@ -1,0 +1,37 @@
+{% extends "sqladmin/create.html" %}
+
+{% block tail %}
+    {{ super() }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const nameField = document.querySelector("#name");
+            const codeField = document.querySelector("#code");
+
+            if (!nameField || !codeField) return;
+
+            nameField.addEventListener("change", function () {
+                codeField.value = generateCodeFromName(nameField.value);
+            });
+
+            function generateCodeFromName(name, randomLength = 3) {
+                const IGNORE = new Set(["of", "the", "and"]);
+                const initials = name
+                    .trim()
+                    .split(/\s+/)
+                    .filter(word => !IGNORE.has(word.toLowerCase()))
+                    .map(word => word[0].toUpperCase())
+                    .join("");
+
+                const chars = "0123456789";
+                let randomPart = "";
+
+                for (let i = 0; i < randomLength; i++) {
+                    randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+
+                return initials + randomPart;
+            }
+        });
+    </script>
+{% endblock %}
+
