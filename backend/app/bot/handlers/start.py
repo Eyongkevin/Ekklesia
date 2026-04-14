@@ -25,7 +25,6 @@ def handle_start(message: dict):
     )
     if response.status_code == 200:
         user = response.json()
-        print(f"Registered user: {user}")
         send_message(
             chat_id,
             f"🎉 Welcome {user['first_name']}! You are now registered to {user['memberships'][0]['church']['name']}"

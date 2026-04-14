@@ -7,7 +7,6 @@ class ChurchCRUD:
         self.db = db
 
     def create_church(self, name: str):
-        print(f"Creating church: {name}")
         church = Church(
             name=name
         )

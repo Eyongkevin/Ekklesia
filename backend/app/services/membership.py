@@ -17,3 +17,6 @@ class MembershipService:
 
     def check_is_super_admin(self, user_id: str) -> bool:
         return self.membership_crud.is_super_admin(user_id)
+    
+    def check_is_church_admin(self, user_id: str) -> bool:
+        return self.membership_crud.is_church_admin(user_id)

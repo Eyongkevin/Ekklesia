@@ -14,7 +14,6 @@ class MembershipCRUD:
             return membership_schemas.Membership.model_validate(membership)
         return None
 
-
     def create_membership(self, user_id: str, role: MembershipRole, church_id: str | None = None) -> membership_schemas.Membership:
         new_membership = Membership(
             user_id=user_id,
@@ -29,5 +28,12 @@ class MembershipCRUD:
         return self.db.query(Membership).filter_by(
             user_id=user_id,
             role=MembershipRole.SUPER_ADMIN,
+            is_active=True
+        ).first() is not None
+    
+    def is_church_admin(self, user_id: str) -> bool:
+        return self.db.query(Membership).filter_by(
+            user_id=user_id,
+            role=MembershipRole.CHURCH_ADMIN,
             is_active=True
         ).first() is not None

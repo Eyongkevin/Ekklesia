@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.bot.webhook import router as telegram_router
 from app.api import invite
 from app.api import church
@@ -7,6 +8,14 @@ from app.admin.dashboard import setup_admin
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3001"],  # your Reflex frontend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(telegram_router, prefix="/api/v1/telegram")
 app.include_router(invite.router, prefix="/api/v1")

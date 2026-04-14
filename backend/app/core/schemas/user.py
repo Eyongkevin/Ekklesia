@@ -20,3 +20,11 @@ class User(UserBase):
     is_active: bool = True
 
     model_config = ConfigDict(from_attributes=True)
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class LoginResponse(BaseModel):
+    message: str
+    user: User
