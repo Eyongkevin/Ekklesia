@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from app.models.membership import Membership
@@ -13,7 +15,6 @@ class MembershipCRUD:
         if membership:
             return membership_schemas.Membership.model_validate(membership)
         return None
-
 
     def create_membership(self, user_id: str, role: MembershipRole, church_id: str | None = None) -> membership_schemas.Membership:
         new_membership = Membership(
@@ -31,3 +32,17 @@ class MembershipCRUD:
             role=MembershipRole.SUPER_ADMIN,
             is_active=True
         ).first() is not None
+    
+    def is_church_admin(self, user_id: str) -> bool:
+        return self.db.query(Membership).filter_by(
+            user_id=user_id,
+            role=MembershipRole.CHURCH_ADMIN,
+            is_active=True
+        ).first() is not None
+    
+    def get_user_church_membership(self, user_id: str) -> Optional[membership_schemas.Membership]:
+        membership =  self.db.query(Membership).filter_by(
+            user_id=user_id,
+            is_active=True
+        ).first()
+        return membership_schemas.Membership.model_validate(membership) if membership else None
