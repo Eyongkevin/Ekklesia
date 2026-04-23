@@ -3,10 +3,11 @@ import reflex as rx
 from app.states.dashboard import DashboardState
 
 def dashboard_sidebar():
+    DashboardState.set_church_name
     return rx.vstack(
         rx.heading("Menu", size="3"),
 
-        sidebar_item("FBC", "home", "church"),
+        sidebar_item(DashboardState.get_church_name, "home", "church"),
         sidebar_item("Event & Schedule", "calendar", "events"),
         sidebar_item("Announcements", "megaphone", "announcements"),
         sidebar_item("Daily Devotion", "book", "devotion"),

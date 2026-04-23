@@ -20,3 +20,6 @@ class MembershipService:
     
     def check_is_church_admin(self, user_id: str) -> bool:
         return self.membership_crud.is_church_admin(user_id)
+    
+    def user_church_membership(self, user_id: str) -> membership_schemas.Membership | None:
+        return self.membership_crud.get_user_church_membership(user_id)

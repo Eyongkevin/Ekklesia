@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(telegram_router, prefix="/api/v1/telegram")
+app.include_router(telegram_router, prefix="/api/v1/telegram", tags=['telegram'])
 app.include_router(invite.router, prefix="/api/v1")
 app.include_router(church.router, prefix="/api/v1")
 app.include_router(user.router, prefix="/api/v1")

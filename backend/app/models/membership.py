@@ -1,10 +1,13 @@
+from typing import Optional
 import uuid
 
-from sqlalchemy import String, DateTime, UniqueConstraint, func, ForeignKey
+from sqlalchemy import String, DateTime, UniqueConstraint, func, ForeignKey, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.core.utils import MembershipRole
+
 
 class Membership(Base):
     __tablename__ = "memberships"
@@ -26,9 +29,15 @@ class Membership(Base):
         nullable=True # For super_user doesn't belong to any church
     )
 
-    role: Mapped[str] = mapped_column(
+    category: Mapped[str] = mapped_column( # check categories in MemberCategory
         String,
-        default="member" # super_admin, church_admin, member, prayer_team, 
+        nullable= True
+    )
+
+    role: Mapped[str] = mapped_column( # check roles in MembershipRole
+        String,
+        default=MembershipRole.MEMBER,
+        nullable=False
     )
 
     is_active: Mapped[bool] = mapped_column(

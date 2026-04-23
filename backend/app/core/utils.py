@@ -13,7 +13,15 @@ class MembershipRole(str, Enum):
     CHURCH_ADMIN = "church_admin"
     MEMBER = "member"
     PRAYER_TEAM = "prayer_team"
+    PASTOR = "pastor"
+    DEACON = "deacon"
+    TEACHER = 'teacher'
+    COUNSELOR = 'counselor'
 
+class MemberCategory(str, Enum):
+    YOUTH = 'youth'
+    ADULT = 'adult'
+    ELDER = 'elder'
 
 def require_role(user: Membership, role: MembershipRole):
     if role != user.role:

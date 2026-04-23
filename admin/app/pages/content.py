@@ -1,25 +1,23 @@
 import reflex as rx
 
 from app.states.dashboard import DashboardState
+from app.pages.contents import profile
 
 def dashboard_content():
-    pages = {
-        "church": rx.text("Church Overview Page"),
-        "events": rx.text("Events Page"),
-        "announcements": rx.text("Announcements Page"),
-        "devotion": rx.text("Daily Devotion Page"),
-        "projects": rx.text("Projects Page"),
-        "qa": rx.text("Q&A Page"),
-        "prayer": rx.text("Prayer Requests"),
-        "marriage": rx.text("Marriage Requests"),
-        "testimony": rx.text("Testimonies"),
-        "child": rx.text("Child Dedication"),
-        "funeral": rx.text("Funeral Requests"),
-    }
-
     return rx.box(
-        pages.get(
+        rx.match(
             DashboardState.current_page,
+            ("church", profile.church_profile_card()),
+            ("events", rx.text("Events Page")),
+            ("announcements", rx.text("Announcements Page")),
+            ("devotion", rx.text("Daily Devotion Page")),
+            ("projects", rx.text("Projects Page")),
+            ("qa", rx.text("Q&A Page")),
+            ("prayer", rx.text("Prayer Requests")),
+            ("marriage", rx.text("Marriage Requests")),
+            ("testimony", rx.text("Testimonies")),
+            ("child", rx.text("Child Dedication")),
+            ("funeral", rx.text("Funeral Requests")),
             rx.text("Page not found")
         ),
         height="100%",

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from app.models.membership import Membership
@@ -37,3 +39,10 @@ class MembershipCRUD:
             role=MembershipRole.CHURCH_ADMIN,
             is_active=True
         ).first() is not None
+    
+    def get_user_church_membership(self, user_id: str) -> Optional[membership_schemas.Membership]:
+        membership =  self.db.query(Membership).filter_by(
+            user_id=user_id,
+            is_active=True
+        ).first()
+        return membership_schemas.Membership.model_validate(membership) if membership else None
