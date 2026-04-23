@@ -57,3 +57,24 @@ def get_church_contact(church_id: str):
     response = httpx.get(f"{BASE_URL}/churches/contact/{church_id}")
     response.raise_for_status()
     return response.json()
+
+# THEME
+def create_or_update_church_theme(
+        church_id: str,
+        year: int,
+        theme: str,
+        verse: str
+):
+    response = httpx.post(f"{BASE_URL}/churches/theme/", json={
+        "church_id": church_id,
+        "year": year,
+        "theme": theme,
+        "verse": verse
+    })
+    response.raise_for_status()
+    return response.json()
+
+def get_church_them_by_year(church_id: str, year: int):
+    response = httpx.get(f"{BASE_URL}/churches/theme/{church_id}/{year}")
+    response.raise_for_status()
+    return response.json()

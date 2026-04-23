@@ -67,10 +67,9 @@ class ContactFormState(rx.State):
             self.website
         )
         if contact:
-            self.reset()
             contact_state: ContactState = await self.get_state(ContactState)
             contact_state.set_church_contact(church_id)
-            self.is_open = False
+            self.reset()
         else: 
             self.error = "Contact not saved. An error occured!!"
 
