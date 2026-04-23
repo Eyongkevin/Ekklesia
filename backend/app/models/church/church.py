@@ -46,7 +46,7 @@ class Church(Base):
 
     memberships = relationship("Membership", back_populates="church", cascade="all, delete-orphan")
     contact = relationship("ChurchContact", back_populates="church", uselist=False, cascade="all, delete-orphan")
-    themes = relationship("ChurchTheme", back_populates="church", uselist=False, cascade="all, delete-orphan")
+    themes = relationship("ChurchTheme", back_populates="church", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return self.name

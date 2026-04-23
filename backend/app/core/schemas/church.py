@@ -3,6 +3,20 @@ from typing import Optional
 import uuid
 from pydantic import BaseModel, ConfigDict
 
+# Theme
+class ThemeBase(BaseModel):
+    church_id: uuid.UUID
+
+    model_config = ConfigDict(from_attributes=True)
+
+class ThemeCreate(ThemeBase):
+    year: int
+    theme: str
+    verse: str
+
+class Theme(ThemeCreate):
+    id: uuid.UUID
+
 # Church
 class ChurchBase(BaseModel):
     name: str
@@ -14,6 +28,7 @@ class ChurchCreate(ChurchBase):
 
 class Church(ChurchBase):
     id: uuid.UUID
+    themes: list[Theme]
 
 # Church Contact
 

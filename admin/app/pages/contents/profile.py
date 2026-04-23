@@ -1,6 +1,7 @@
 import reflex as rx
 
 from app.states.contact import ContactState, ContactFormState
+from app.states import theme as theme_states
 
 
 def stat_item(label: str, value: str):
@@ -60,13 +61,13 @@ def stat_group(title: str, *items, columns="3"):
         width="100%",
     )
 
-def edit_contact_button():
+def edit_button(action):
     
     return rx.icon_button(
         "pencil",
         size="2",
         variant="ghost",
-        on_click=ContactFormState.open_modal,
+        on_click=action,
     )
 
 def profile_section():
@@ -161,15 +162,6 @@ def stats_section():
         ),
     )
 
-def theme_section():
-    return section_card(
-        "Theme",
-        rx.vstack(
-            rx.text("My Year of Spiritual Growth."),
-            rx.text("- 2 Peter 3:18")
-        )
-    )
-
 def contact_section():
     return section_card(
         "Contact",
@@ -217,7 +209,37 @@ def contact_section():
             spacing="5",
             width="100%",
             ),
-        action=edit_contact_button(),
+        action=edit_button(ContactFormState.open_modal),
+    )
+
+# THEME
+def theme_section():
+    return section_card(
+        "Theme",
+        rx.box(
+            rx.vstack(
+                rx.text(
+                    theme_states.ThemeState.theme,
+                    font_size="1.4em",
+                    font_weight="600",
+                    line_height="1.4",
+                ),
+
+                rx.text(
+                    f"{theme_states.ThemeState.verse}",
+                    font_size="0.9em",
+                    color="gray",
+                    font_style="italic",
+                ),
+
+                align="start",
+                spacing="2",
+            ),
+            border_left="4px solid #6366F1",
+            padding_left="1em",
+            width="100%",
+        ),
+        action=edit_button(theme_states.ThemeFormState.open_modal)
     )
 
 def church_profile_card():
@@ -230,7 +252,10 @@ def church_profile_card():
                     contact_section(),
                     contact_modal(),
                 ),
-                theme_section(),
+                rx.fragment(
+                    theme_section(),
+                    theme_modal(),
+                ),
                 spacing="4",
                 width="50%",
             ),
@@ -251,6 +276,16 @@ def labeled_input(label, placeholder, state, state_func=None):
         spacing="1",
         width="100%",
     )
+
+def labeled_textarea(label, placeholder, state, state_func=None, focus=False):
+    return rx.vstack(
+        rx.text(label, font_size="0.9em", font_weight="500"),
+        rx.text_area(placeholder=placeholder, value=state, on_change=state_func, auto_focus=focus),
+        align="start",
+        spacing="1",
+        width="100%",
+    )
+
 def contact_modal():
     return rx.dialog.root(
         rx.dialog.content(
@@ -320,4 +355,34 @@ def contact_modal():
 
         ),
         open=ContactFormState.is_open,
+    )
+
+def theme_modal():
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.dialog.title("Edit Theme"),
+            rx.text(theme_states.ThemeFormState.error, color='red'),
+            rx.vstack(
+            # YEAR
+            labeled_input("Year", "Enter year", theme_states.ThemeFormState.year, theme_states.ThemeFormState.set_year),
+            # THEME
+            labeled_textarea("Theme", "Enter theme", theme_states.ThemeFormState.theme, theme_states.ThemeFormState.set_theme, focus=True),
+            # VERSE
+            labeled_input("Verse", "Enter (,) separated verses", theme_states.ThemeFormState.verse, theme_states.ThemeFormState.set_verse),
+            # ACTION BUTTONS
+            rx.hstack(
+                rx.button("Cancel", variant="soft",  on_click=theme_states.ThemeFormState.close_modal),
+                rx.button("Save Changes", color_scheme="green", on_click=theme_states.ThemeFormState.save_theme),
+                justify="end",
+                width="100%",
+                margin_top="1em",
+            ),
+
+            spacing="4",
+            width="100%",
+        ),
+        max_width="500px",
+
+        ),
+        open=theme_states.ThemeFormState.is_open,
     )

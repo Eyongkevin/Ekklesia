@@ -1,4 +1,5 @@
 from typing import Callable
+from datetime import date
 
 import reflex as rx
 
@@ -6,6 +7,7 @@ from app.services import auth as auth_service
 from app.services import church as church_service
 from app.states.dashboard import DashboardState
 from app.states.contact import ContactState
+from app.states.theme import ThemeState
 
 
 class AuthState(rx.State):
@@ -23,6 +25,9 @@ class AuthState(rx.State):
 
         church_contact_state: ContactState = await self.get_state(ContactState)
         church_contact_state.set_church_contact(dashboard_state.church.get('id'))
+
+        church_theme_state: ThemeState = await self.get_state(ThemeState)
+        church_theme_state.set_church_theme(dashboard_state.church.get('id'), date.today().year)
 
     def set_auth(self, user: dict):
         self.user = user
