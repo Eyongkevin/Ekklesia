@@ -185,19 +185,23 @@ def contact_section():
                         "Social",
                         rx.link(
                             "Facebook",
-                            href=ContactState.facebook
+                            href=ContactState.facebook,
+                            is_external=True
                         ),
                         rx.link(
                             "YouTube",
                             rx.text(ContactState.youtube),
+                            is_external=True
                         ),
                         rx.link(
                             "Instagram",
                             rx.text(ContactState.instagram),
+                            is_external=True
                         ),
                         rx.link(
                             "Website",
                             rx.text(ContactState.website),
+                            is_external=True
                         ),
                         columns="1",
                     ),
