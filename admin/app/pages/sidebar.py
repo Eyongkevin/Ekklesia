@@ -1,13 +1,13 @@
 import reflex as rx
 
 from app.states.dashboard import DashboardState
+from app.states.church import ChurchState
 
 def dashboard_sidebar():
-    DashboardState.set_church_name
     return rx.vstack(
         rx.heading("Menu", size="3"),
 
-        sidebar_item(DashboardState.get_church_name, "home", "church"),
+        sidebar_item(ChurchState.get_church_name, "home", "church"),
         sidebar_item("Event & Schedule", "calendar", "events"),
         sidebar_item("Announcements", "megaphone", "announcements"),
         sidebar_item("Daily Devotion", "book", "devotion"),
@@ -26,19 +26,10 @@ def dashboard_sidebar():
 
         width="250px",
         height="100%",
-        overflow_y="auto",   # 👈 enables sidebar scroll
+        overflow_y="auto",
         border_right="1px solid #eee",
         padding="1em",
         align="start",
-
-        # width="250px",
-        # padding="1em",
-        # border_right="1px solid #eee",
-        # height="100vh",
-        # overflow_y="auto",
-        # position="sticky",
-        # top="0",
-        # align="start"
     )
 
 def sidebar_item(label: str, icon: str, page: str):

@@ -301,17 +301,11 @@ def contact_modal():
             rx.dialog.title("Edit Contact"),
             rx.text(ContactFormState.error, color='red'),
             rx.vstack(
-            # COUNTRY
             labeled_input("Country", "Enter country", ContactFormState.country, ContactFormState.set_country),
-            # CITY
             labeled_input("City", "Enter city", ContactFormState.city, ContactFormState.set_city),
-            # ADDRESS
             labeled_input("Address", "Enter address", ContactFormState.address_line, ContactFormState.set_address_line),
-            # EMAIL
             labeled_input("Email", "Enter email", ContactFormState.email, ContactFormState.set_email),
-            # PHONE 1
             labeled_input("Phone 1", "Enter phone number 1", ContactFormState.phone_1, ContactFormState.set_phone_1),
-            # PHONE 2
             labeled_input("Phone 2", "Enter phone number 2", ContactFormState.phone_2, ContactFormState.set_phone_2),
 
             rx.divider(margin_y="1em"),
@@ -372,11 +366,8 @@ def theme_modal():
             rx.dialog.title("Edit Theme"),
             rx.text(theme_states.ThemeFormState.error, color='red'),
             rx.vstack(
-            # YEAR
             labeled_input("Year", "Enter year", theme_states.ThemeFormState.year, theme_states.ThemeFormState.set_year),
-            # THEME
             labeled_textarea("Theme", "Enter theme", theme_states.ThemeFormState.theme, theme_states.ThemeFormState.set_theme, focus=True),
-            # VERSE
             labeled_input("Verse", "Enter (,) separated verses", theme_states.ThemeFormState.verse, theme_states.ThemeFormState.set_verse),
             # ACTION BUTTONS
             rx.hstack(

@@ -9,7 +9,7 @@ from app.core.security import create_access_token
 from app.db.uow import UnitOfWork
 
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/users", tags=["Users_memberships"])
 
 
 @router.post("/register", response_model=user_schemas.User)

@@ -1,7 +1,7 @@
 from datetime import date
 
 import reflex as rx
-from app.states.dashboard import DashboardState
+from app.states.church import ChurchState
 from app.services import church as church_service
 
 class ThemeState(rx.State):
@@ -30,7 +30,7 @@ class ThemeFormState(rx.State):
 
     @rx.event
     async def open_modal(self):
-        church_state = await self.get_state(DashboardState)
+        church_state = await self.get_state(ChurchState)
         church_id: str = church_state.church.get('id', '')
         self.set_church_theme(church_id, date.today().year)
 
@@ -42,7 +42,7 @@ class ThemeFormState(rx.State):
 
     @rx.event
     async def save_theme(self):
-        church_state = await self.get_state(DashboardState)
+        church_state = await self.get_state(ChurchState)
         church_id: str = church_state.church.get('id', '')
 
         theme = church_service.create_or_update_church_theme(

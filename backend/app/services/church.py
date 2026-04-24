@@ -12,7 +12,6 @@ class ChurchService:
         self.church_crud = ChurchCRUD(self.uow.db)
 
     def create_church(self, name: str) -> schema_church.Church:
-        # return dict(id=1, name='Test Church')
         return self.church_crud.create_church(name)
     
     def get_church_by_id(self, church_id: str) -> schema_church.Church | None:

@@ -2,22 +2,23 @@ from typing import Optional
 
 import httpx
 
-BASE_URL = "http://localhost:8002/api/v1"
+from app.config import settings
+
 
 def create_church(name: str):
-    response = httpx.post(f"{BASE_URL}/churches/", json={
+    response = httpx.post(f"{settings.BASE_URL}/churches/", json={
         "name": name
     })
     response.raise_for_status()
     return response.json()
 
 def get_churches():
-    response = httpx.get(f"{BASE_URL}/churches/")
+    response = httpx.get(f"{settings.BASE_URL}/churches/")
     response.raise_for_status()
     return response.json()
 
 def get_church_by_user(user_id: str):
-    response = httpx.get(f"{BASE_URL}/churches/user/{user_id}")
+    response = httpx.get(f"{settings.BASE_URL}/churches/user/{user_id}")
     response.raise_for_status()
     return response.json()
 
@@ -36,7 +37,7 @@ def create_church_contact(
     instagram: Optional[str] = None,
     website: Optional[str] = None) -> dict[str, str]:
 
-    response = httpx.post(f"{BASE_URL}/churches/contact/", json={
+    response = httpx.post(f"{settings.BASE_URL}/churches/contact/", json={
         "church_id": church_id,
         "country": country,
         "city": city,
@@ -54,7 +55,7 @@ def create_church_contact(
     return response.json()
 
 def get_church_contact(church_id: str):
-    response = httpx.get(f"{BASE_URL}/churches/contact/{church_id}")
+    response = httpx.get(f"{settings.BASE_URL}/churches/contact/{church_id}")
     response.raise_for_status()
     return response.json()
 
@@ -65,7 +66,7 @@ def create_or_update_church_theme(
         theme: str,
         verse: str
 ):
-    response = httpx.post(f"{BASE_URL}/churches/theme/", json={
+    response = httpx.post(f"{settings.BASE_URL}/churches/theme/", json={
         "church_id": church_id,
         "year": year,
         "theme": theme,
@@ -75,6 +76,6 @@ def create_or_update_church_theme(
     return response.json()
 
 def get_church_them_by_year(church_id: str, year: int):
-    response = httpx.get(f"{BASE_URL}/churches/theme/{church_id}/{year}")
+    response = httpx.get(f"{settings.BASE_URL}/churches/theme/{church_id}/{year}")
     response.raise_for_status()
     return response.json()
