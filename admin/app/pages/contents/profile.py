@@ -1,12 +1,16 @@
 import reflex as rx
 
 from app.states.contact import ContactState, ContactFormState
-from app.states import theme as theme_states
+from app.states import (
+    theme as theme_states,
+    membership as membership_states
+)
+
 
 
 def stat_item(label: str, value: str):
     return rx.vstack(
-        rx.text(value, font_size="1.5em", font_weight="bold"),
+        rx.text(value, font_size="1.3em", font_weight="bold"),
         rx.text(label, font_size="0.9em", color="gray"),
         align="center",
         padding="0.1em"
@@ -107,12 +111,13 @@ def stats_section():
             rx.box(
                 stat_group(
                     "Roles",
-                    stat_item("Admin", "2"),
-                    stat_item("Pastor", "2"),
-                    stat_item("Deacon", "2"),
-                    stat_item("Teacher", "10"),
-                    stat_item("Counselor", "7"),
-                    stat_item("Member", "752"),
+                    stat_item("Admin", membership_states.MembershipState.role_counts.get('church_admin')),
+                    stat_item("Pastor", membership_states.MembershipState.role_counts.get('pastor', 0)),
+                    stat_item("Deacon", membership_states.MembershipState.role_counts.get('deacon', 0)),
+                    stat_item("Teacher", membership_states.MembershipState.role_counts.get('teacher', 0)),
+                    stat_item("Counselor", membership_states.MembershipState.role_counts.get('counselor', 0)),
+                    stat_item("Member", membership_states.MembershipState.role_counts.get('member', 0)),
+                    stat_item("Payer Members", membership_states.MembershipState.role_counts.get('prayer_team', 0)),
                     columns="3",
                 ),
                 padding="1em",
@@ -122,10 +127,10 @@ def stats_section():
             rx.box(
                 stat_group(
                     "Categories",
-                    stat_item("Youth", "327"),
-                    stat_item("Adult", "215"),
-                    stat_item("Elder", "81"),
-                    stat_item("Children", "129"),
+                    stat_item("Youth", membership_states.MembershipState.category_counts.get('youth', 0)),
+                    stat_item("Adult", membership_states.MembershipState.category_counts.get('adult', 0)),
+                    stat_item("Elder", membership_states.MembershipState.role_counts.get('elder', 0)),
+                    # stat_item("Children", "129"),
                     columns="2",
                 ),
                 padding="1em",
@@ -157,7 +162,7 @@ def stats_section():
                 background="#f9fafb",
             ),
 
-            spacing="9",
+            spacing="5",
             width="100%",
         ),
     )

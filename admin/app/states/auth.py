@@ -8,6 +8,7 @@ from app.services import church as church_service
 from app.states.dashboard import DashboardState
 from app.states.contact import ContactState
 from app.states.theme import ThemeState
+from app.states.membership import MembershipState
 
 
 class AuthState(rx.State):
@@ -28,6 +29,9 @@ class AuthState(rx.State):
 
         church_theme_state: ThemeState = await self.get_state(ThemeState)
         church_theme_state.set_church_theme(dashboard_state.church.get('id'), date.today().year)
+
+        membership_state: MembershipState = await self.get_state(MembershipState)
+        membership_state.set_stats(dashboard_state.church.get('id'))
 
     def set_auth(self, user: dict):
         self.user = user

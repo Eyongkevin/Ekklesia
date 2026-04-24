@@ -43,3 +43,7 @@ async def login_user(payload: user_schemas.LoginRequest, response: Response, uow
         "message": "Login successful",
         "user": user
     }
+
+@router.get('/memberships/{church_id}/stats')
+def membership_stats(church_id: str, uow: UnitOfWork = Depends(get_db)) -> dict[str, dict[str, int]]:
+    return MembershipService(uow).get_church_membership_stats(church_id)

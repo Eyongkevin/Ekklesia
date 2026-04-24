@@ -23,3 +23,12 @@ class MembershipService:
     
     def user_church_membership(self, user_id: str) -> membership_schemas.Membership | None:
         return self.membership_crud.get_user_church_membership(user_id)
+    
+    def get_church_membership_stats(self, church_id: str) -> dict[str, dict[str, int]]:
+        role_counts = self.membership_crud.get_church_membership_role_count(church_id)
+        category_counts = self.membership_crud.get_church_membership_category_count(church_id)
+
+        return {
+            'role_counts': {role: count for role, count in role_counts},
+            'category_counts': {cat: count for cat, count in category_counts if cat}
+        }
