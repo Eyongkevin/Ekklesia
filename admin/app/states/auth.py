@@ -8,6 +8,8 @@ from app.services import church as church_service
 from app.states.dashboard import DashboardState
 from app.states.contact import ContactState
 from app.states.theme import ThemeState
+from app.states.membership import MembershipState
+from app.states.church import ChurchState
 
 
 class AuthState(rx.State):
@@ -20,14 +22,19 @@ class AuthState(rx.State):
         if not self.is_authenticated:
             return rx.redirect("/login")
         
-        dashboard_state: DashboardState = await self.get_state(DashboardState)
-        dashboard_state.church = church_service.get_church_by_user(self.user.get('id', ''))
+        # Load states used in the loading of profile information.
 
+        church_state: ChurchState = await self.get_state(ChurchState)
+        church_state.church = church_service.get_church_by_user(self.user.get('id', ''))
+        
         church_contact_state: ContactState = await self.get_state(ContactState)
-        church_contact_state.set_church_contact(dashboard_state.church.get('id'))
+        church_contact_state.set_church_contact(church_state.church.get('id'))
 
         church_theme_state: ThemeState = await self.get_state(ThemeState)
-        church_theme_state.set_church_theme(dashboard_state.church.get('id'), date.today().year)
+        church_theme_state.set_church_theme(church_state.church.get('id'), date.today().year)
+
+        membership_state: MembershipState = await self.get_state(MembershipState)
+        membership_state.set_stats(church_state.church.get('id'))
 
     def set_auth(self, user: dict):
         self.user = user
@@ -39,7 +46,6 @@ class AuthState(rx.State):
         self.user = {}
         self.is_authenticated = False
         return rx.redirect("/login")
-    
 
 class LoginState(AuthState):
     email: str = ""

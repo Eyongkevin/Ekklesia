@@ -1,5 +1,5 @@
 import reflex as rx
-from app.states.dashboard import DashboardState
+from app.states.church import ChurchState
 from app.services import church as church_service
 
 class ContactState(rx.State):
@@ -38,7 +38,7 @@ class ContactFormState(rx.State):
 
     @rx.event
     async def open_modal(self):
-        church_state = await self.get_state(DashboardState)
+        church_state = await self.get_state(ChurchState)
         church_id = church_state.church.get('id')
         self.set_church_contact(church_id)
 
@@ -50,7 +50,7 @@ class ContactFormState(rx.State):
 
     @rx.event
     async def save_contact(self):
-        church_state = await self.get_state(DashboardState)
+        church_state = await self.get_state(ChurchState)
         church_id: str = church_state.church.get('id', '')
 
         contact = church_service.create_church_contact(

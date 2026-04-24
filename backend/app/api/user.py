@@ -9,7 +9,7 @@ from app.core.security import create_access_token
 from app.db.uow import UnitOfWork
 
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/users", tags=["Users_memberships"])
 
 
 @router.post("/register", response_model=user_schemas.User)
@@ -43,3 +43,7 @@ async def login_user(payload: user_schemas.LoginRequest, response: Response, uow
         "message": "Login successful",
         "user": user
     }
+
+@router.get('/memberships/{church_id}/stats')
+def membership_stats(church_id: str, uow: UnitOfWork = Depends(get_db)) -> dict[str, dict[str, int]]:
+    return MembershipService(uow).get_church_membership_stats(church_id)

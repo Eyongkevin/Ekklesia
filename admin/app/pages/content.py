@@ -22,10 +22,6 @@ def dashboard_content():
         ),
         height="100%",
         width="100%",
-        overflow_y="auto",   # 👈 independent scroll
+        overflow_y="auto",
         padding="2em",
-        # width="100%",
-        # # flex="1",
-        # overflow_y="auto",
-        # padding="2em",
     )

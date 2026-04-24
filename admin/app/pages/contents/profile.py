@@ -1,12 +1,16 @@
 import reflex as rx
 
 from app.states.contact import ContactState, ContactFormState
-from app.states import theme as theme_states
+from app.states import (
+    theme as theme_states,
+    membership as membership_states
+)
+
 
 
 def stat_item(label: str, value: str):
     return rx.vstack(
-        rx.text(value, font_size="1.5em", font_weight="bold"),
+        rx.text(value, font_size="1.3em", font_weight="bold"),
         rx.text(label, font_size="0.9em", color="gray"),
         align="center",
         padding="0.1em"
@@ -107,12 +111,13 @@ def stats_section():
             rx.box(
                 stat_group(
                     "Roles",
-                    stat_item("Admin", "2"),
-                    stat_item("Pastor", "2"),
-                    stat_item("Deacon", "2"),
-                    stat_item("Teacher", "10"),
-                    stat_item("Counselor", "7"),
-                    stat_item("Member", "752"),
+                    stat_item("Admin", membership_states.MembershipState.role_counts.get('church_admin')),
+                    stat_item("Pastor", membership_states.MembershipState.role_counts.get('pastor', 0)),
+                    stat_item("Deacon", membership_states.MembershipState.role_counts.get('deacon', 0)),
+                    stat_item("Teacher", membership_states.MembershipState.role_counts.get('teacher', 0)),
+                    stat_item("Counselor", membership_states.MembershipState.role_counts.get('counselor', 0)),
+                    stat_item("Member", membership_states.MembershipState.role_counts.get('member', 0)),
+                    stat_item("Payer Members", membership_states.MembershipState.role_counts.get('prayer_team', 0)),
                     columns="3",
                 ),
                 padding="1em",
@@ -122,10 +127,10 @@ def stats_section():
             rx.box(
                 stat_group(
                     "Categories",
-                    stat_item("Youth", "327"),
-                    stat_item("Adult", "215"),
-                    stat_item("Elder", "81"),
-                    stat_item("Children", "129"),
+                    stat_item("Youth", membership_states.MembershipState.category_counts.get('youth', 0)),
+                    stat_item("Adult", membership_states.MembershipState.category_counts.get('adult', 0)),
+                    stat_item("Elder", membership_states.MembershipState.role_counts.get('elder', 0)),
+                    # stat_item("Children", "129"),
                     columns="2",
                 ),
                 padding="1em",
@@ -157,7 +162,7 @@ def stats_section():
                 background="#f9fafb",
             ),
 
-            spacing="9",
+            spacing="5",
             width="100%",
         ),
     )
@@ -185,19 +190,23 @@ def contact_section():
                         "Social",
                         rx.link(
                             "Facebook",
-                            href=ContactState.facebook
+                            href=ContactState.facebook,
+                            is_external=True
                         ),
                         rx.link(
                             "YouTube",
                             rx.text(ContactState.youtube),
+                            is_external=True
                         ),
                         rx.link(
                             "Instagram",
                             rx.text(ContactState.instagram),
+                            is_external=True
                         ),
                         rx.link(
                             "Website",
                             rx.text(ContactState.website),
+                            is_external=True
                         ),
                         columns="1",
                     ),
@@ -292,17 +301,11 @@ def contact_modal():
             rx.dialog.title("Edit Contact"),
             rx.text(ContactFormState.error, color='red'),
             rx.vstack(
-            # COUNTRY
             labeled_input("Country", "Enter country", ContactFormState.country, ContactFormState.set_country),
-            # CITY
             labeled_input("City", "Enter city", ContactFormState.city, ContactFormState.set_city),
-            # ADDRESS
             labeled_input("Address", "Enter address", ContactFormState.address_line, ContactFormState.set_address_line),
-            # EMAIL
             labeled_input("Email", "Enter email", ContactFormState.email, ContactFormState.set_email),
-            # PHONE 1
             labeled_input("Phone 1", "Enter phone number 1", ContactFormState.phone_1, ContactFormState.set_phone_1),
-            # PHONE 2
             labeled_input("Phone 2", "Enter phone number 2", ContactFormState.phone_2, ContactFormState.set_phone_2),
 
             rx.divider(margin_y="1em"),
@@ -363,11 +366,8 @@ def theme_modal():
             rx.dialog.title("Edit Theme"),
             rx.text(theme_states.ThemeFormState.error, color='red'),
             rx.vstack(
-            # YEAR
             labeled_input("Year", "Enter year", theme_states.ThemeFormState.year, theme_states.ThemeFormState.set_year),
-            # THEME
             labeled_textarea("Theme", "Enter theme", theme_states.ThemeFormState.theme, theme_states.ThemeFormState.set_theme, focus=True),
-            # VERSE
             labeled_input("Verse", "Enter (,) separated verses", theme_states.ThemeFormState.verse, theme_states.ThemeFormState.set_verse),
             # ACTION BUTTONS
             rx.hstack(

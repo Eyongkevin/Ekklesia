@@ -1,8 +1,8 @@
 import httpx
 
-BASE_URL = "http://localhost:8002/api/v1"
+from app.config import settings
 
 async def login(email: str, password: str):
-    response = httpx.post(f"{BASE_URL}/users/login/", json={"email": email, "password": password})
+    response = httpx.post(f"{settings.BASE_URL}/users/login/", json={"email": email, "password": password})
     response.raise_for_status()
     return response.json()

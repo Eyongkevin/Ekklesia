@@ -1,6 +1,7 @@
 from typing import Optional
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.models.membership import Membership
 from app.core.schemas import membership as membership_schemas
@@ -46,3 +47,19 @@ class MembershipCRUD:
             is_active=True
         ).first()
         return membership_schemas.Membership.model_validate(membership) if membership else None
+    
+    def get_church_membership_role_count(self, church_id: str):
+        return (
+            self.db.query(Membership.role, func.count(Membership.id))
+            .filter_by(church_id=church_id)
+            .group_by(Membership.role)
+            .all()
+        )
+    
+    def get_church_membership_category_count(self, church_id: str):
+        return (
+            self.db.query(Membership.category, func.count(Membership.id))
+            .filter_by(church_id=church_id)
+            .group_by(Membership.category)
+            .all()
+        )

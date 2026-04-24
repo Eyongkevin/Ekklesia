@@ -3,9 +3,14 @@ from app.services import church as church_services
 
 class ChurchState(rx.State):
     name: str = ""
+    church: dict = {}
     churches: list[dict] = []
     contact: dict[str, str] = {}
 
+    @rx.var
+    def get_church_name(self) -> str:
+        return self.church.get('name', '')
+    
     @rx.event
     def load_churches(self):
         self.churches = church_services.get_churches()

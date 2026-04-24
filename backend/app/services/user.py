@@ -8,7 +8,7 @@ from app.core.utils import verify_password
 
 
 class UserService:
-    def __init__(self, uow: UnitOfWork):
+    def __init__(self, uow: UnitOfWork) -> None:
         self.uow = uow
         self.user_crud = UserCRUD(self.uow.db)
         self.invite_service = InviteService(self.uow)

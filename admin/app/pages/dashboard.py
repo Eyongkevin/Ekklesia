@@ -9,10 +9,8 @@ def dashboard_page():
         dashboard_header(),
 
         rx.hstack(
-            dashboard_sidebar(),  # right (nav)
-            dashboard_content(),   # left (main)
-            # width="100%",
-            # height="100%",
+            dashboard_sidebar(),
+            dashboard_content(),
             position="absolute",
             top="80px",
             left="0",
@@ -21,10 +19,4 @@ def dashboard_page():
         ),
         height="100vh",
         overflow="hidden",
-        # height="100vh",
-        # spacing="0",
-        # padding_top="65px",
-        # overflow="hidden",
-        # height="calc(100vh - 80px)",
-        # margin_top="80px",
     )
