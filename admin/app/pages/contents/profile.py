@@ -1,9 +1,10 @@
 import reflex as rx
 
-from app.states.contact import ContactState, ContactFormState
 from app.states import (
     theme as theme_states,
-    membership as membership_states
+    membership as membership_states,
+    church as church_states,
+    contact as contact_states
 )
 
 
@@ -86,7 +87,7 @@ def profile_section():
             ),
             rx.box(
                 rx.text(
-                    "Grace Community Church",
+                    church_states.ChurchState.get_church_name,
                     color="white",
                     font_weight="bold",
                     font_size="1.2em",
@@ -174,11 +175,11 @@ def contact_section():
                 rx.box(
                     stat_group(
                         "Address",
-                        rx.text(ContactState.country),
-                        rx.text(f"📍 {ContactState.city} {ContactState.address_line}"),
-                        rx.text(f"📞 {ContactState.phone_1}"),
-                        rx.text(f"📞 {ContactState.phone_2}"),
-                        rx.text(f"✉️ {ContactState.email}"),
+                        rx.text(contact_states.ContactState.country),
+                        rx.text(f"📍 {contact_states.ContactState.city} {contact_states.ContactState.address_line}"),
+                        rx.text(f"📞 {contact_states.ContactState.phone_1}"),
+                        rx.text(f"📞 {contact_states.ContactState.phone_2}"),
+                        rx.text(f"✉️ {contact_states.ContactState.email}"),
                         columns="1",
                     ),
                     padding="1em",
@@ -190,22 +191,22 @@ def contact_section():
                         "Social",
                         rx.link(
                             "Facebook",
-                            href=ContactState.facebook,
+                            href=contact_states.ContactState.facebook,
                             is_external=True
                         ),
                         rx.link(
                             "YouTube",
-                            rx.text(ContactState.youtube),
+                            rx.text(contact_states.ContactState.youtube),
                             is_external=True
                         ),
                         rx.link(
                             "Instagram",
-                            rx.text(ContactState.instagram),
+                            rx.text(contact_states.ContactState.instagram),
                             is_external=True
                         ),
                         rx.link(
                             "Website",
-                            rx.text(ContactState.website),
+                            rx.text(contact_states.ContactState.website),
                             is_external=True
                         ),
                         columns="1",
@@ -218,7 +219,7 @@ def contact_section():
             spacing="5",
             width="100%",
             ),
-        action=edit_button(ContactFormState.open_modal),
+        action=edit_button(contact_states.ContactFormState.open_modal),
     )
 
 # THEME
@@ -299,14 +300,14 @@ def contact_modal():
     return rx.dialog.root(
         rx.dialog.content(
             rx.dialog.title("Edit Contact"),
-            rx.text(ContactFormState.error, color='red'),
+            rx.text(contact_states.ContactFormState.error, color='red'),
             rx.vstack(
-            labeled_input("Country", "Enter country", ContactFormState.country, ContactFormState.set_country),
-            labeled_input("City", "Enter city", ContactFormState.city, ContactFormState.set_city),
-            labeled_input("Address", "Enter address", ContactFormState.address_line, ContactFormState.set_address_line),
-            labeled_input("Email", "Enter email", ContactFormState.email, ContactFormState.set_email),
-            labeled_input("Phone 1", "Enter phone number 1", ContactFormState.phone_1, ContactFormState.set_phone_1),
-            labeled_input("Phone 2", "Enter phone number 2", ContactFormState.phone_2, ContactFormState.set_phone_2),
+            labeled_input("Country", "Enter country", contact_states.ContactFormState.country, contact_states.ContactFormState.set_country),
+            labeled_input("City", "Enter city", contact_states.ContactFormState.city, contact_states.ContactFormState.set_city),
+            labeled_input("Address", "Enter address", contact_states.ContactFormState.address_line, contact_states.ContactFormState.set_address_line),
+            labeled_input("Email", "Enter email", contact_states.ContactFormState.email, contact_states.ContactFormState.set_email),
+            labeled_input("Phone 1", "Enter phone number 1", contact_states.ContactFormState.phone_1, contact_states.ContactFormState.set_phone_1),
+            labeled_input("Phone 2", "Enter phone number 2", contact_states.ContactFormState.phone_2, contact_states.ContactFormState.set_phone_2),
 
             rx.divider(margin_y="1em"),
 
@@ -324,15 +325,15 @@ def contact_modal():
                 ),
 
                 rx.hstack(
-                    rx.input(placeholder="YouTube", value=ContactFormState.youtube, on_change=ContactFormState.set_youtube),
-                    rx.input(placeholder="Facebook", value=ContactFormState.facebook, on_change=ContactFormState.set_facebook),
+                    rx.input(placeholder="YouTube", value=contact_states.ContactFormState.youtube, on_change=contact_states.ContactFormState.set_youtube),
+                    rx.input(placeholder="Facebook", value=contact_states.ContactFormState.facebook, on_change=contact_states.ContactFormState.set_facebook),
                     spacing="3",
                     width="100%",
                 ),
 
                 rx.hstack(
-                    rx.input(placeholder="Instagram", value=ContactFormState.instagram, on_change=ContactFormState.set_instagram),
-                    rx.input(placeholder="Website", value=ContactFormState.website, on_change=ContactFormState.set_website),
+                    rx.input(placeholder="Instagram", value=contact_states.ContactFormState.instagram, on_change=contact_states.ContactFormState.set_instagram),
+                    rx.input(placeholder="Website", value=contact_states.ContactFormState.website, on_change=contact_states.ContactFormState.set_website),
                     spacing="3",
                     width="100%",
                 ),
@@ -344,8 +345,8 @@ def contact_modal():
 
             # ACTION BUTTONS
             rx.hstack(
-                rx.button("Cancel", variant="soft",  on_click=ContactFormState.close_modal),
-                rx.button("Save Changes", color_scheme="green", on_click=ContactFormState.save_contact),
+                rx.button("Cancel", variant="soft",  on_click=contact_states.ContactFormState.close_modal),
+                rx.button("Save Changes", color_scheme="green", on_click=contact_states.ContactFormState.save_contact),
                 justify="end",
                 width="100%",
                 margin_top="1em",
@@ -357,7 +358,7 @@ def contact_modal():
         max_width="500px",
 
         ),
-        open=ContactFormState.is_open,
+        open=contact_states.ContactFormState.is_open,
     )
 
 def theme_modal():
