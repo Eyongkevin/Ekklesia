@@ -1,10 +1,10 @@
 from typing import Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, date
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import ForeignKey, String, Boolean, Text, DateTime, CheckConstraint
+from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import ForeignKey, String, Boolean, Text, DateTime, CheckConstraint, text, Date
 from sqlalchemy.sql import func
 
 from app.db.base import Base
@@ -21,6 +21,11 @@ class Announcement(Base):
 
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    links: Mapped[list[dict[str, str]]] = mapped_column(
+        JSONB,
+        nullable=False,
+        server_default=text("'[]'::jsonb")
+    )
 
     status_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -30,8 +35,8 @@ class Announcement(Base):
 
     is_pinned: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    publish_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    expire_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    publish_at: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    expire_at: Mapped[Optional[datetime]] = mapped_column(Date, nullable=True)
 
     # event_id: Mapped[Optional[uuid.UUID]] = mapped_column(
     #     UUID(as_uuid=True),
@@ -42,6 +47,12 @@ class Announcement(Base):
     created_by: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    church_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("churches.id"),
         nullable=False
     )
 

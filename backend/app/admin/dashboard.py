@@ -2,7 +2,7 @@ from sqladmin import Admin
 from app.db.session import engine
 
 from app.admin.auth import AdminAuth
-from app.admin.views import UserAdmin, ChurchAdmin, MembershipAdmin
+from app.admin import views
 from app.core.config import settings
 
 
@@ -15,6 +15,9 @@ def setup_admin(app):
     )
 
     # Register views
-    admin.add_view(UserAdmin)
-    admin.add_view(ChurchAdmin)
-    admin.add_view(MembershipAdmin)
+    admin.add_view(views.UserAdmin)
+    admin.add_view(views.ChurchAdmin)
+    admin.add_view(views.MembershipAdmin)
+    admin.add_view(views.AnnouncementStatusAdmin)
+    admin.add_view(views.AnnouncementTagAdmin)
+    admin.add_view(views.AnnouncementAudienceAdmin)
