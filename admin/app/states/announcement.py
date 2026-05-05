@@ -8,6 +8,78 @@ from app.states.audience import AudienceState
 from app.states.auth import AuthState
 from app.states.church import ChurchState
 
+sample_announcements = [
+    {
+        "id": 1,
+        "title": "Baptism Service - May Edition",
+        "content": "Join us this Sunday for the baptism of new members after the main service.",
+        "status": "Published",
+        "published_at": "2026-05-01 18:00",
+    },
+    {
+        "id": 2,
+        "title": "Youth Conference 2026",
+        "content": "A powerful gathering for young people with guest speakers and worship sessions.",
+        "status": "Scheduled",
+        "published_at": "2026-05-10 10:00",
+    },
+    {
+        "id": 3,
+        "title": "Weekly Prayer Meeting",
+        "content": "Join us every Wednesday evening for a time of prayer and intercession.",
+        "status": "Published",
+        "published_at": "2026-04-28 17:30",
+    },
+    {
+        "id": 4,
+        "title": "Church Cleanup Exercise",
+        "content": "Volunteers are needed this Saturday to help clean and organize the church premises.",
+        "status": "Draft",
+        "published_at": "",
+    },
+    {
+        "id": 5,
+        "title": "Marriage Seminar",
+        "content": "A seminar focused on building strong and lasting relationships.",
+        "status": "Expired",
+        "published_at": "2026-03-15 09:00",
+    },
+    {
+        "id": 6,
+        "title": "Choir Auditions",
+        "content": "Interested in joining the choir? Auditions will be held this Friday.",
+        "status": "Published",
+        "published_at": "2026-04-30 16:00",
+    },
+    {
+        "id": 7,
+        "title": "Leadership Training",
+        "content": "Training session for all department leaders and assistants.",
+        "status": "Scheduled",
+        "published_at": "2026-05-12 14:00",
+    },
+    {
+        "id": 8,
+        "title": "Easter Thanksgiving Service",
+        "content": "A special thanksgiving service celebrating the resurrection of Christ.",
+        "status": "Expired",
+        "published_at": "2026-04-05 08:00",
+    },
+    {
+        "id": 9,
+        "title": "New Members Orientation",
+        "content": "Orientation session to welcome and guide new members of the church.",
+        "status": "Published",
+        "published_at": "2026-05-02 11:00",
+    },
+    {
+        "id": 10,
+        "title": "Evangelism Outreach",
+        "content": "Join the outreach team as we spread the gospel in nearby communities.",
+        "status": "Draft",
+        "published_at": "",
+    },
+]
 
 class AnnouncementState(rx.State):
     show_add_update_drawer: bool = False
@@ -143,4 +215,73 @@ class AnouncementTagState(rx.State):
     def get_tags_name(self) -> list[str]:
         return [tag.get('name') for tag in self.tags]
 
+class AnnouncementFilterState(rx.State):
+    search: str = ""
+    status: str = "Published"
+    audience: str = "All Audience"
+    tag: str = "All Tags"
 
+
+    def set_search(self, value: str):
+        self.search = value
+
+    def set_status(self, value: str):
+        self.status = value
+
+    def set_audience(self, value: str):
+        self.audience = value
+
+    def set_tag(self, value: str):
+        self.tag = value
+
+    def set_start_date(self, value: str):
+        self.start_date = value
+
+    def set_end_date(self, value: str):
+        self.end_date = value
+
+class AnnouncementListState(rx.State):
+    announcements: list = sample_announcements  # fetched from backend
+
+    page: int = 1
+    per_page: int = 10
+
+    selected_ids: set[int] = set()
+
+    open_menu_id: int | None = None
+
+    def toggle_menu(self, announcement_id: int):
+        if self.open_menu_id == announcement_id:
+            self.open_menu_id = None
+        else:
+            self.open_menu_id = announcement_id
+
+    def next_page(self):
+        self.page += 1
+
+    def prev_page(self):
+        if self.page > 1:
+            self.page -= 1
+
+    def toggle_select(self, announcement_id: int):
+        if announcement_id in self.selected_ids:
+            self.selected_ids.remove(announcement_id)
+        else:
+            self.selected_ids.add(announcement_id)
+
+    def select_all(self):
+        current_ids = [a["id"] for a in self.paginated_announcements]
+        self.selected_ids = set(current_ids)
+
+    def clear_selection(self):
+        self.selected_ids = set()
+
+    @rx.var
+    def paginated_announcements(self) -> list[dict]:
+        start = (self.page - 1) * self.per_page
+        end = start + self.per_page
+        return self.announcements[start:end]
+
+    @rx.var
+    def total_pages(self) -> int:
+        return (len(self.announcements) + self.per_page - 1) // self.per_page

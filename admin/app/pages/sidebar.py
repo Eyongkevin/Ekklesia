@@ -29,6 +29,7 @@ def dashboard_sidebar():
         overflow_y="auto",
         border_right="1px solid #eee",
         padding="1em",
+        padding_top="5em",
         align="start",
     )
 
