@@ -7,8 +7,6 @@ from app.states import (
     contact as contact_states
 )
 
-
-
 def stat_item(label: str, value: str):
     return rx.vstack(
         rx.text(value, font_size="1.3em", font_weight="bold"),
@@ -67,7 +65,6 @@ def stat_group(title: str, *items, columns="3"):
     )
 
 def edit_button(action):
-    
     return rx.icon_button(
         "pencil",
         size="2",
@@ -131,7 +128,6 @@ def stats_section():
                     stat_item("Youth", membership_states.MembershipState.category_counts.get('youth', 0)),
                     stat_item("Adult", membership_states.MembershipState.category_counts.get('adult', 0)),
                     stat_item("Elder", membership_states.MembershipState.role_counts.get('elder', 0)),
-                    # stat_item("Children", "129"),
                     columns="2",
                 ),
                 padding="1em",
@@ -302,61 +298,60 @@ def contact_modal():
             rx.dialog.title("Edit Contact"),
             rx.text(contact_states.ContactFormState.error, color='red'),
             rx.vstack(
-            labeled_input("Country", "Enter country", contact_states.ContactFormState.country, contact_states.ContactFormState.set_country),
-            labeled_input("City", "Enter city", contact_states.ContactFormState.city, contact_states.ContactFormState.set_city),
-            labeled_input("Address", "Enter address", contact_states.ContactFormState.address_line, contact_states.ContactFormState.set_address_line),
-            labeled_input("Email", "Enter email", contact_states.ContactFormState.email, contact_states.ContactFormState.set_email),
-            labeled_input("Phone 1", "Enter phone number 1", contact_states.ContactFormState.phone_1, contact_states.ContactFormState.set_phone_1),
-            labeled_input("Phone 2", "Enter phone number 2", contact_states.ContactFormState.phone_2, contact_states.ContactFormState.set_phone_2),
+                labeled_input("Country", "Enter country", contact_states.ContactFormState.country, contact_states.ContactFormState.set_country),
+                labeled_input("City", "Enter city", contact_states.ContactFormState.city, contact_states.ContactFormState.set_city),
+                labeled_input("Address", "Enter address", contact_states.ContactFormState.address_line, contact_states.ContactFormState.set_address_line),
+                labeled_input("Email", "Enter email", contact_states.ContactFormState.email, contact_states.ContactFormState.set_email),
+                labeled_input("Phone 1", "Enter phone number 1", contact_states.ContactFormState.phone_1, contact_states.ContactFormState.set_phone_1),
+                labeled_input("Phone 2", "Enter phone number 2", contact_states.ContactFormState.phone_2, contact_states.ContactFormState.set_phone_2),
 
-            rx.divider(margin_y="1em"),
+                rx.divider(margin_y="1em"),
 
-            # SOCIALS SECTION
-            rx.vstack(
-                rx.text(
-                    "Social Media & Website",
-                    font_size="1em",
-                    font_weight="600",
-                ),
-                rx.text(
-                    "Add your church online presence links",
-                    font_size="0.8em",
-                    color="gray",
-                ),
+                # SOCIALS SECTION
+                rx.vstack(
+                    rx.text(
+                        "Social Media & Website",
+                        font_size="1em",
+                        font_weight="600",
+                    ),
+                    rx.text(
+                        "Add your church online presence links",
+                        font_size="0.8em",
+                        color="gray",
+                    ),
 
-                rx.hstack(
-                    rx.input(placeholder="YouTube", value=contact_states.ContactFormState.youtube, on_change=contact_states.ContactFormState.set_youtube),
-                    rx.input(placeholder="Facebook", value=contact_states.ContactFormState.facebook, on_change=contact_states.ContactFormState.set_facebook),
-                    spacing="3",
+                    rx.hstack(
+                        rx.input(placeholder="YouTube", value=contact_states.ContactFormState.youtube, on_change=contact_states.ContactFormState.set_youtube),
+                        rx.input(placeholder="Facebook", value=contact_states.ContactFormState.facebook, on_change=contact_states.ContactFormState.set_facebook),
+                        spacing="3",
+                        width="100%",
+                    ),
+
+                    rx.hstack(
+                        rx.input(placeholder="Instagram", value=contact_states.ContactFormState.instagram, on_change=contact_states.ContactFormState.set_instagram),
+                        rx.input(placeholder="Website", value=contact_states.ContactFormState.website, on_change=contact_states.ContactFormState.set_website),
+                        spacing="3",
+                        width="100%",
+                    ),
+
+                    align="start",
                     width="100%",
+                    spacing="2",
                 ),
 
+                # ACTION BUTTONS
                 rx.hstack(
-                    rx.input(placeholder="Instagram", value=contact_states.ContactFormState.instagram, on_change=contact_states.ContactFormState.set_instagram),
-                    rx.input(placeholder="Website", value=contact_states.ContactFormState.website, on_change=contact_states.ContactFormState.set_website),
-                    spacing="3",
+                    rx.button("Cancel", variant="soft",  on_click=contact_states.ContactFormState.close_modal),
+                    rx.button("Save Changes", color_scheme="green", on_click=contact_states.ContactFormState.save_contact),
+                    justify="end",
                     width="100%",
+                    margin_top="1em",
                 ),
 
-                align="start",
+                spacing="4",
                 width="100%",
-                spacing="2",
             ),
-
-            # ACTION BUTTONS
-            rx.hstack(
-                rx.button("Cancel", variant="soft",  on_click=contact_states.ContactFormState.close_modal),
-                rx.button("Save Changes", color_scheme="green", on_click=contact_states.ContactFormState.save_contact),
-                justify="end",
-                width="100%",
-                margin_top="1em",
-            ),
-
-            spacing="4",
-            width="100%",
-        ),
-        max_width="500px",
-
+            max_width="500px",
         ),
         open=contact_states.ContactFormState.is_open,
     )
@@ -367,23 +362,22 @@ def theme_modal():
             rx.dialog.title("Edit Theme"),
             rx.text(theme_states.ThemeFormState.error, color='red'),
             rx.vstack(
-            labeled_input("Year", "Enter year", theme_states.ThemeFormState.year, theme_states.ThemeFormState.set_year),
-            labeled_textarea("Theme", "Enter theme", theme_states.ThemeFormState.theme, theme_states.ThemeFormState.set_theme, focus=True),
-            labeled_input("Verse", "Enter (,) separated verses", theme_states.ThemeFormState.verse, theme_states.ThemeFormState.set_verse),
-            # ACTION BUTTONS
-            rx.hstack(
-                rx.button("Cancel", variant="soft",  on_click=theme_states.ThemeFormState.close_modal),
-                rx.button("Save Changes", color_scheme="green", on_click=theme_states.ThemeFormState.save_theme),
-                justify="end",
+                labeled_input("Year", "Enter year", theme_states.ThemeFormState.year, theme_states.ThemeFormState.set_year),
+                labeled_textarea("Theme", "Enter theme", theme_states.ThemeFormState.theme, theme_states.ThemeFormState.set_theme, focus=True),
+                labeled_input("Verse", "Enter (,) separated verses", theme_states.ThemeFormState.verse, theme_states.ThemeFormState.set_verse),
+                # ACTION BUTTONS
+                rx.hstack(
+                    rx.button("Cancel", variant="soft",  on_click=theme_states.ThemeFormState.close_modal),
+                    rx.button("Save Changes", color_scheme="green", on_click=theme_states.ThemeFormState.save_theme),
+                    justify="end",
+                    width="100%",
+                    margin_top="1em",
+                ),
+
+                spacing="4",
                 width="100%",
-                margin_top="1em",
             ),
-
-            spacing="4",
-            width="100%",
-        ),
-        max_width="500px",
-
+            max_width="500px",
         ),
         open=theme_states.ThemeFormState.is_open,
     )

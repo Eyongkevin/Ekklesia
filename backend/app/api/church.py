@@ -8,7 +8,7 @@ from app.services import church as church_service
 from app.core.schemas import church as schema_church
 from app.db.uow import UnitOfWork
 
-router = APIRouter(prefix="/churches", tags=["churches_contacts_theme"])
+router = APIRouter(prefix="/churches", tags=["churches, contact, announcement"])
 
 @router.post("/")
 def create(church: schema_church.ChurchCreate, uow: UnitOfWork = Depends(get_db)) -> schema_church.Church:

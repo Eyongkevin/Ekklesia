@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.bot.webhook import router as telegram_router
-from app.api import invite
-from app.api import church
-from app.api import user
+from app.api import invite, church, user, announcement, status, audience
 from app.admin.dashboard import setup_admin
 
 
@@ -21,4 +19,7 @@ app.include_router(telegram_router, prefix="/api/v1/telegram", tags=['telegram']
 app.include_router(invite.router, prefix="/api/v1")
 app.include_router(church.router, prefix="/api/v1")
 app.include_router(user.router, prefix="/api/v1")
+app.include_router(announcement.router, prefix="/api/v1")
+app.include_router(status.router, prefix="/api/v1")
+app.include_router(audience.router, prefix="/api/v1")
 setup_admin(app)
