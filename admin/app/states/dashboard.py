@@ -1,6 +1,6 @@
 import reflex as rx
 
-from app.states.announcement import AnnouncementTagState
+from app.states.announcement import AnnouncementListState, AnnouncementTagState
 from app.states.status import StatusState
 from app.states.audience import AudienceState
 
@@ -20,6 +20,9 @@ class DashboardState(rx.State):
 
             audience_state = await self.get_state(AudienceState)
             audience_state.get_active_audiences()
+
+            announcement_list_state = await self.get_state(AnnouncementListState)
+            await announcement_list_state.paginated_announcements()
         self.current_page = page
 
     @rx.var

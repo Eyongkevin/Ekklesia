@@ -40,3 +40,26 @@ def submit(
     response.raise_for_status()
     return response.json()
 
+def get_announcements(
+    church_id: str,
+    status: str,
+    audience: str,
+    tag: str,
+    search: str,
+    is_active: bool = True,
+    page: int = 1,
+    per_page: int = 10
+) -> list[dict]:
+    params = {
+        "church_id": church_id,
+        "status": status,
+        "audience": audience,
+        "tag": tag,
+        "search": search,
+        "is_active": is_active,
+        "page": page,
+        "per_page": per_page
+    }
+    response = httpx.get(f"{settings.BASE_URL}/announcements/", params=params)
+    response.raise_for_status()
+    return response.json()

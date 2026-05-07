@@ -10,10 +10,16 @@ class AnnouncementType(TypedDict):
     id: int
     title: str
     content: str
-    status: str
-    published_at: str
-    tags: List[str]
-    audience: List[str]
+    status: dict[str, str | bool]
+    publish_at: Optional[str]
+    expire_at: Optional[str]
+    created_by: str
+    is_pinned: bool
+    links: list[dict[str, str]]
+    tags: List[dict[str, str | bool]]
+    audiences: List[dict[str, str | bool]]
+    created_at: str
+    modified_at: str
 
 sample_announcements: list[AnnouncementType] = [
     {
@@ -287,10 +293,11 @@ class AnnouncementFilterState(rx.State):
         self.end_date = value
 
 class AnnouncementListState(rx.State):
-    announcements: list[AnnouncementType] = sample_announcements  # fetched from backend
+    announcements: list[AnnouncementType] = []  # fetched from backend
 
     page: int = 1
-    per_page: int = 10
+    per_page: int = 3
+    total_pages: int = 1
 
     selected_ids: set[int] = set()
 
@@ -302,12 +309,15 @@ class AnnouncementListState(rx.State):
         else:
             self.open_menu_id = announcement_id
 
-    def next_page(self):
-        self.page += 1
+    async def next_page(self):
+        if self.page < self.total_pages:
+            self.page += 1
+            await self.paginated_announcements()
 
-    def prev_page(self):
+    async def prev_page(self):
         if self.page > 1:
             self.page -= 1
+            await self.paginated_announcements()
 
     def toggle_select(self, announcement_id: int):
         if announcement_id in self.selected_ids:
@@ -316,18 +326,33 @@ class AnnouncementListState(rx.State):
             self.selected_ids.add(announcement_id)
 
     def select_all(self):
-        current_ids = [a["id"] for a in self.paginated_announcements]
+        current_ids = [a["id"] for a in self.announcements]
         self.selected_ids = set(current_ids)
 
     def clear_selection(self):
         self.selected_ids = set()
 
-    @rx.var
-    def paginated_announcements(self) -> list[AnnouncementType]:
-        start = (self.page - 1) * self.per_page
-        end = start + self.per_page
-        return self.announcements[start:end]
+    async def paginated_announcements(self)-> None:
+        # start = (self.page - 1) * self.per_page
+        # end = start + self.per_page
+        church_state: ChurchState = await self.get_state(ChurchState)
+        church_id = church_state.church.get('id')
 
-    @rx.var
-    def total_pages(self) -> int:
-        return (len(self.announcements) + self.per_page - 1) // self.per_page
+        filter_state = await self.get_state(AnnouncementFilterState)
+
+        announcements = announcement_service.get_announcements(
+            church_id=church_id,
+            status=filter_state.status,
+            audience=filter_state.audience,
+            tag=filter_state.tag,
+            search=filter_state.search,
+            is_active=True,
+            page=self.page,
+            per_page=self.per_page
+        )
+        self.total_pages = announcements.get("total", 0) // self.per_page + 1
+        self.announcements = announcements.get("announcements", [])
+
+    # @rx.var
+    # def total_pages(self) -> int:
+    #     return (len(self.announcements) + self.per_page - 1) // self.per_page

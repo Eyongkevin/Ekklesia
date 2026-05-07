@@ -556,29 +556,49 @@ def announcement_actions_menu(announcement_id: int):
         ),
     )
 
-def tag_badge(tag: str):
+def tag_badge(tag: dict[str, str | bool]):
     return rx.box(
-        tag,
+        tag.get('name', '-'),
         padding="2px 8px",
         border_radius="12px",
         font_size="8px",
         bg="#e8f0fe",
-        color="#1a73e8",
-        margin_right="4px",
-    )
-
-
-def audience_badge(audience: str):
-    return rx.box(
-        audience,
-        padding="2px 8px",
-        border_radius="12px",
-        font_size="8px",
-        bg="#e6f4ea",
         color="#137333",
         margin_right="4px",
     )
 
+link_badge = lambda link: rx.box(
+    rx.link(
+        link['title'],
+            href=link['url'],
+            is_external=True,
+            #color="#2563eb",
+        ),
+        padding="2px 8px",
+        border_radius="12px",
+        font_size="8px",
+        bg="#e6f4ea",
+        color="#1a73e8",
+        margin_right="4px",
+)
+
+def audience_badge(audience: dict[str, str | bool]):
+    return rx.box(
+        audience.get('name', '-'),
+        padding="2px 8px",
+        border_radius="12px",
+        font_size="8px",
+        bg="#e6f4ea",
+        color="#010101",
+        margin_right="4px",
+    )
+
+def get_announcement_item_name(item)-> str:
+    return rx.cond(
+        item,
+        item['name'],
+        "-"
+    )
 
 def announcement_row(announcement):
     short_desc = get_short_desc(announcement["content"], 100)
@@ -594,7 +614,7 @@ def announcement_row(announcement):
             rx.text(
                 announcement["title"],
                 font_weight="600",
-                font_size="15px",
+                font_size="14px",
             ),
             rx.text(
                 short_desc,
@@ -602,21 +622,22 @@ def announcement_row(announcement):
                 color="gray",
                 no_of_lines=2,
             ),
-            # Tags section
+            # Tags, audience and links section
             rx.hstack(
+                rx.icon("tags", size=12, color="gray"),
                 rx.foreach(
                     announcement["tags"],
                     tag_badge,
                 ),
-                wrap="wrap",
-                spacing="1",
-            ),
-
-            # Audience section
-            rx.hstack(
+                rx.icon("users", size=12, color="gray"),
                 rx.foreach(
-                    announcement["audience"],
+                    announcement["audiences"],
                     audience_badge,
+                ),
+                rx.icon("link_2", size=12, color="gray"),
+                rx.foreach(
+                    announcement["links"],
+                    link_badge,
                 ),
                 wrap="wrap",
                 spacing="1",
@@ -627,9 +648,9 @@ def announcement_row(announcement):
         # 📌 Status
         rx.box(
             rx.badge(
-                announcement["status"],
+                get_announcement_item_name(announcement["status"]),
                 color_scheme=rx.match(
-                    announcement["status"],
+                    get_announcement_item_name(announcement["status"]),
                     ("Published", "green"),
                     ("Draft", "gray"),
                     ("Expired", "red"),
@@ -644,10 +665,14 @@ def announcement_row(announcement):
         rx.box(
             rx.text(
                 rx.cond(
-                    announcement["published_at"],
-                    announcement["published_at"],
+                    announcement["publish_at"],
+                    rx.moment(
+                        announcement["publish_at"],
+                        format="MMM D, YYYY",
+                    ),
                     "-"
-                    )
+                    ),
+                font_size="13px",
             ),
             width="20%",
         ),
@@ -668,7 +693,7 @@ def announcement_table():
         announcement_table_header(),
 
         rx.foreach(
-            AnnouncementListState.paginated_announcements,
+            AnnouncementListState.announcements,
             announcement_row,
         ),
         width="100%",
@@ -683,7 +708,7 @@ def pagination_controls():
         rx.button(
             "Previous",
             on_click=AnnouncementListState.prev_page,
-            is_disabled=AnnouncementListState.page == 1,
+            disabled=AnnouncementListState.page == 1,
         ),
 
         rx.text(
@@ -693,7 +718,7 @@ def pagination_controls():
         rx.button(
             "Next",
             on_click=AnnouncementListState.next_page,
-            is_disabled=AnnouncementListState.page == AnnouncementListState.total_pages,
+            disabled=AnnouncementListState.page == AnnouncementListState.total_pages,
         ),
 
         justify="end",

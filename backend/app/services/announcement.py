@@ -29,6 +29,29 @@ class AnnouncementService:
             status_id=status.id
         )
     
+    def get_announcements(self, 
+                    church_id: str,
+                    status: str,
+                    audience: str,
+                    tag: str,
+                    search: str,
+                    is_active: bool = True,
+                    page: int = 1,
+                    per_page: int = 10) ->  dict[str, list[schema_announcement.Announcement] | int]:
+        offset = (page - 1) * per_page
+
+        return self.announcement_crud.get_announcements(
+            church_id=church_id,
+            status=status,
+            audience=None if audience == "All Members" else audience,
+            tag=None if tag == "All Tags" else tag,
+            search=None if search == "" else search,
+            is_active=is_active,
+            offset=offset,
+            limit=per_page
+        )
+        
+    
 
 # TAGS
 class AnnouncementTagService:
