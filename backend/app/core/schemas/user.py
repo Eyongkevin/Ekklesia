@@ -21,6 +21,10 @@ class User(UserBase):
 
     model_config = ConfigDict(from_attributes=True)
 
+class UserAnnouncement(BaseModel):
+    first_name: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
 class LoginRequest(BaseModel):
     email: str
     password: str

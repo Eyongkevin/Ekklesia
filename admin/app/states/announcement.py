@@ -11,6 +11,7 @@ class AnnouncementType(TypedDict):
     title: str
     content: str
     status: dict[str, str | bool]
+    creator: dict[str, str]
     publish_at: Optional[str]
     expire_at: Optional[str]
     created_by: str

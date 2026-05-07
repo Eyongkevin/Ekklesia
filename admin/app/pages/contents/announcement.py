@@ -519,7 +519,8 @@ def announcement_table_header():
             on_change=lambda _: AnnouncementListState.select_all()
         ),
         rx.text("Announcement", font_weight="bold", width="40%"),
-        rx.text("Status", font_weight="bold", width="15%"),
+        rx.text("Status", font_weight="bold", width="10%"),
+        rx.text("Created By", font_weight="bold", width="10%"),
         rx.text("Published Date", font_weight="bold", width="20%"),
         rx.text("Actions", font_weight="bold", width="15%"),
         padding="0.75em",
@@ -658,7 +659,19 @@ def announcement_row(announcement):
                     "yellow",  # default
                 ),
             ),
-            width="15%",
+            width="10%",
+        ),
+        # 📅 Created By
+        rx.box(
+            rx.text(
+                rx.cond(
+                    announcement["creator"],
+                    announcement["creator"]["first_name"],
+                    "-"
+                ),
+                font_size="13px",
+            ),
+            width="10%",
         ),
 
         # 📅 Published Date
@@ -671,7 +684,7 @@ def announcement_row(announcement):
                         format="MMM D, YYYY",
                     ),
                     "-"
-                    ),
+                ),
                 font_size="13px",
             ),
             width="20%",
