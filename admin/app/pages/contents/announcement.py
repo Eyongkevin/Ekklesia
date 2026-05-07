@@ -628,7 +628,14 @@ def announcement_row(announcement):
         rx.box(
             rx.badge(
                 announcement["status"],
-                color_scheme="green"  # you can map dynamically later
+                color_scheme=rx.match(
+                    announcement["status"],
+                    ("Published", "green"),
+                    ("Draft", "gray"),
+                    ("Expired", "red"),
+                    ("Scheduled", "blue"),
+                    "yellow",  # default
+                ),
             ),
             width="15%",
         ),
