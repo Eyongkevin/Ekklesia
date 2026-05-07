@@ -274,17 +274,25 @@ class AnnouncementFilterState(rx.State):
     tag: str = "All Tags"
 
 
-    def set_search(self, value: str):
+    async def set_search(self, value: str):
         self.search = value
+        announcement_list_state = await self.get_state(AnnouncementListState)
+        await announcement_list_state.paginated_announcements()
 
-    def set_status(self, value: str):
+    async def set_status(self, value: str):
         self.status = value
+        announcement_list_state = await self.get_state(AnnouncementListState)
+        await announcement_list_state.paginated_announcements()
 
-    def set_audience(self, value: str):
+    async def set_audience(self, value: str):
         self.audience = value
+        announcement_list_state = await self.get_state(AnnouncementListState)
+        await announcement_list_state.paginated_announcements()
 
-    def set_tag(self, value: str):
+    async def set_tag(self, value: str):
         self.tag = value
+        announcement_list_state = await self.get_state(AnnouncementListState)
+        await announcement_list_state.paginated_announcements()
 
     def set_start_date(self, value: str):
         self.start_date = value
