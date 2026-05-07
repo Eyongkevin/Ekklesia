@@ -5,7 +5,7 @@ from app.states.announcement import (
     AnnouncementListState,
     AnnouncementState, 
     AnnouncementFormState, 
-    AnouncementTagState)
+    AnnouncementTagState)
 from app.states.status import StatusState
 from app.states.audience import AudienceState
 from app.pages.components.form_label import form_label
@@ -262,7 +262,7 @@ def links_section():
     )
 
 def tags_section():
-    available_tags = AnouncementTagState.get_tags_name
+    available_tags = AnnouncementTagState.get_tags_name
 
     return rx.box(
         rx.text("Tags", font_weight="bold", size='1'),
@@ -484,19 +484,19 @@ def announcement_filters():
             ),
 
             rx.select(
-                ["Draft", "Published", "Scheduled", "Expired"],
+                StatusState.get_status_names,
                 value=AnnouncementFilterState.status,
                 on_change=AnnouncementFilterState.set_status,
             ),
 
             rx.select(
-                ["All Audience", "Members", "Leaders", "Visitors"],
+                AudienceState.get_audience_name,
                 value=AnnouncementFilterState.audience,
                 on_change=AnnouncementFilterState.set_audience,
             ),
 
             rx.select(
-                ["All Tags", "Baptism", "Event", "Urgent"],
+                AnnouncementTagState.get_tags_name,
                 value=AnnouncementFilterState.tag,
                 on_change=AnnouncementFilterState.set_tag,
             ),

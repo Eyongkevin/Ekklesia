@@ -4,8 +4,6 @@ import reflex as rx
 
 from app.services import announcement as announcement_service
 from app.states.status import StatusState
-from app.states.audience import AudienceState
-from app.states.auth import AuthState
 from app.states.church import ChurchState
 
 class AnnouncementType(TypedDict):
@@ -115,15 +113,7 @@ class AnnouncementState(rx.State):
 
     @rx.event
     async def open_add_update_drawer(self):
-        tag_state = await self.get_state(AnouncementTagState)
-        tag_state.get_tags()
-
         status_state = await self.get_state(StatusState)
-        status_state.get_active_status()
-
-        audience_state = await self.get_state(AudienceState)
-        audience_state.get_active_audiences()
-
         announcement_form_state = await self.get_state(AnnouncementFormState)
         #? We want the default to be 'Published'. So, here it needs to be the second status
         announcement_form_state.status = status_state.get_status_names[1]
@@ -154,6 +144,8 @@ class AnnouncementFormState(rx.State):
     new_link_title: str = ""
 
     async def submit(self):
+        from app.states.auth import AuthState
+
         auth_state: AuthState = await self.get_state(AuthState)
         created_by = auth_state.user.get('id')
 
@@ -257,7 +249,7 @@ class AnnouncementFormState(rx.State):
         elif self.status == 'Published':
             self.publish_date = str(date.today())
 
-class AnouncementTagState(rx.State):
+class AnnouncementTagState(rx.State):
     name: str
     description: str
     tags: list[dict[str, str | bool]]
@@ -272,7 +264,7 @@ class AnouncementTagState(rx.State):
 class AnnouncementFilterState(rx.State):
     search: str = ""
     status: str = "Published"
-    audience: str = "All Audience"
+    audience: str = "All Members"
     tag: str = "All Tags"
 
 
