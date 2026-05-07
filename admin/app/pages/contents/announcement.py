@@ -9,6 +9,7 @@ from app.states.announcement import (
 from app.states.status import StatusState
 from app.states.audience import AudienceState
 from app.pages.components.form_label import form_label
+from app.utils import get_short_desc
 
 
 def church_announcement_card():
@@ -526,52 +527,61 @@ def announcement_table_header():
     )
 
 def announcement_actions_menu(announcement_id: int):
-    return rx.box(
-        # ⋮ trigger
-        rx.text(
-            "⋮",
-            font_size="22px",
-            cursor="pointer",
-            padding="4px 8px",
-            border_radius="6px",
-            _hover={"bg": "#f0f0f0"},
-            on_click=lambda: AnnouncementListState.toggle_menu(announcement_id),
+    return rx.menu.root(
+        rx.menu.trigger(
+            rx.text("⋮", font_size="22px", cursor="pointer"),
         ),
-
-        # dropdown
-        rx.cond(
-            AnnouncementListState.open_menu_id == announcement_id,
-            rx.box(
-                rx.text(
-                    "View",
-                    padding="8px",
-                    cursor="pointer",
+        rx.menu.content(
+            rx.menu.item(
+                "View",
+                on_click=lambda: AnnouncementListState.toggle_select(announcement_id),
+            ),
+            rx.menu.item(
+                "Edit",
+                on_click=lambda: AnnouncementListState.toggle_select(announcement_id),
+            ),
+            rx.menu.sub(
+                rx.menu.sub_trigger("Toggle Options"),
+                rx.menu.sub_content(
+                    rx.menu.item("Activate"),
+                    rx.menu.item("Pin to Top"),
                 ),
-                rx.text(
-                    "Edit",
-                    padding="8px",
-                    cursor="pointer",
-                ),
-                rx.text(
-                    "Delete",
-                    padding="8px",
-                    cursor="pointer",
-                    color="red",
-                ),
-
-                position="absolute",
-                bg="white",
-                box_shadow="lg",
-                border_radius="8px",
-                min_width="120px",
-                z_index="10",
+            ),
+            rx.menu.separator(),
+            rx.menu.item(
+                "Delete",
+                on_click=lambda: AnnouncementListState.toggle_select(announcement_id),
+                color="red",
             ),
         ),
-
-        position="relative",
     )
 
+def tag_badge(tag: str):
+    return rx.box(
+        tag,
+        padding="2px 8px",
+        border_radius="12px",
+        font_size="8px",
+        bg="#e8f0fe",
+        color="#1a73e8",
+        margin_right="4px",
+    )
+
+
+def audience_badge(audience: str):
+    return rx.box(
+        audience,
+        padding="2px 8px",
+        border_radius="12px",
+        font_size="8px",
+        bg="#e6f4ea",
+        color="#137333",
+        margin_right="4px",
+    )
+
+
 def announcement_row(announcement):
+    short_desc = get_short_desc(announcement["content"], 100)
     return rx.hstack(
         # ✅ Checkbox
         rx.checkbox(
@@ -587,27 +597,52 @@ def announcement_row(announcement):
                 font_size="15px",
             ),
             rx.text(
-                announcement["content"],
+                short_desc,
                 font_size="13px",
                 color="gray",
                 no_of_lines=2,
+            ),
+            # Tags section
+            rx.hstack(
+                rx.foreach(
+                    announcement["tags"],
+                    tag_badge,
+                ),
+                wrap="wrap",
+                spacing="1",
+            ),
+
+            # Audience section
+            rx.hstack(
+                rx.foreach(
+                    announcement["audience"],
+                    audience_badge,
+                ),
+                wrap="wrap",
+                spacing="1",
             ),
             width="40%",
         ),
 
         # 📌 Status
-        rx.badge(
-            announcement["status"],
-            color_scheme="green"  # you can map dynamically later
+        rx.box(
+            rx.badge(
+                announcement["status"],
+                color_scheme="green"  # you can map dynamically later
+            ),
+            width="15%",
         ),
 
         # 📅 Published Date
-        rx.text(
-            rx.cond(
-                announcement["published_at"],
-                announcement["published_at"],
-                "-"
-                )
+        rx.box(
+            rx.text(
+                rx.cond(
+                    announcement["published_at"],
+                    announcement["published_at"],
+                    "-"
+                    )
+            ),
+            width="20%",
         ),
 
         # ⚙️ Actions

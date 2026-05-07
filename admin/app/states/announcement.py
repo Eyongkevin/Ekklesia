@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TypedDict, List
 from datetime import date
 import reflex as rx
 
@@ -8,13 +8,24 @@ from app.states.audience import AudienceState
 from app.states.auth import AuthState
 from app.states.church import ChurchState
 
-sample_announcements = [
+class AnnouncementType(TypedDict):
+    id: int
+    title: str
+    content: str
+    status: str
+    published_at: str
+    tags: List[str]
+    audience: List[str]
+
+sample_announcements: list[AnnouncementType] = [
     {
         "id": 1,
         "title": "Baptism Service - May Edition",
         "content": "Join us this Sunday for the baptism of new members after the main service.",
         "status": "Published",
         "published_at": "2026-05-01 18:00",
+        "tags": ['Prayer', 'Event', 'Conference'],
+        "audience": ['Men'], 
     },
     {
         "id": 2,
@@ -22,6 +33,8 @@ sample_announcements = [
         "content": "A powerful gathering for young people with guest speakers and worship sessions.",
         "status": "Scheduled",
         "published_at": "2026-05-10 10:00",
+        "tags": ["Conference"],
+        "audience": ["Youth"],
     },
     {
         "id": 3,
@@ -29,6 +42,8 @@ sample_announcements = [
         "content": "Join us every Wednesday evening for a time of prayer and intercession.",
         "status": "Published",
         "published_at": "2026-04-28 17:30",
+        "tags": ['Prayer', 'General', 'Urgent'],
+        "audience": ['All Members'],
     },
     {
         "id": 4,
@@ -36,6 +51,8 @@ sample_announcements = [
         "content": "Volunteers are needed this Saturday to help clean and organize the church premises.",
         "status": "Draft",
         "published_at": "",
+        "tags": ["Baptism", "Urgent"],
+        "audience": ["Youth"],
     },
     {
         "id": 5,
@@ -43,6 +60,8 @@ sample_announcements = [
         "content": "A seminar focused on building strong and lasting relationships.",
         "status": "Expired",
         "published_at": "2026-03-15 09:00",
+        "tags": ["Baptism", "Urgent"],
+        "audience": ["Members", "Leaders"],
     },
     {
         "id": 6,
@@ -50,6 +69,8 @@ sample_announcements = [
         "content": "Interested in joining the choir? Auditions will be held this Friday.",
         "status": "Published",
         "published_at": "2026-04-30 16:00",
+        "tags": [],
+        "audience": [],
     },
     {
         "id": 7,
@@ -57,6 +78,8 @@ sample_announcements = [
         "content": "Training session for all department leaders and assistants.",
         "status": "Scheduled",
         "published_at": "2026-05-12 14:00",
+        "tags": [],
+        "audience": [],
     },
     {
         "id": 8,
@@ -64,6 +87,8 @@ sample_announcements = [
         "content": "A special thanksgiving service celebrating the resurrection of Christ.",
         "status": "Expired",
         "published_at": "2026-04-05 08:00",
+        "tags": [],
+        "audience": [],
     },
     {
         "id": 9,
@@ -71,6 +96,8 @@ sample_announcements = [
         "content": "Orientation session to welcome and guide new members of the church.",
         "status": "Published",
         "published_at": "2026-05-02 11:00",
+        "tags": [],
+        "audience": [],
     },
     {
         "id": 10,
@@ -78,6 +105,8 @@ sample_announcements = [
         "content": "Join the outreach team as we spread the gospel in nearby communities.",
         "status": "Draft",
         "published_at": "",
+        "tags": [],
+        "audience": [],
     },
 ]
 
@@ -175,6 +204,31 @@ class AnnouncementFormState(rx.State):
         else:
             self.audiences.append(audience)
 
+    def set_new_link_title(self, value: str):
+        self.new_link_title = value
+    
+    def set_new_link(self, value: str):
+        self.new_link = value
+
+    def set_content(self, value: str):
+        self.content = value
+    
+    def set_title(self, value: str):
+        self.title = value
+
+    def set_status(self, value: str):
+        self.status = value
+
+    def set_pin_to_top(self, value: bool):
+        self.pin_to_top = value
+
+    def set_publish_date(self, value: str):
+        self.publish_date = value
+
+    def set_expire_date(self, value: str):
+        self.expire_date = value
+
+
     @rx.var
     def is_max_links_reached(self) -> bool:
         return len(self.links) >= self.max_links 
@@ -241,7 +295,7 @@ class AnnouncementFilterState(rx.State):
         self.end_date = value
 
 class AnnouncementListState(rx.State):
-    announcements: list = sample_announcements  # fetched from backend
+    announcements: list[AnnouncementType] = sample_announcements  # fetched from backend
 
     page: int = 1
     per_page: int = 10
@@ -277,7 +331,7 @@ class AnnouncementListState(rx.State):
         self.selected_ids = set()
 
     @rx.var
-    def paginated_announcements(self) -> list[dict]:
+    def paginated_announcements(self) -> list[AnnouncementType]:
         start = (self.page - 1) * self.per_page
         end = start + self.per_page
         return self.announcements[start:end]

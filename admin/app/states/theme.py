@@ -64,3 +64,11 @@ class ThemeFormState(rx.State):
             for key, value in theme.items():
                 if hasattr(self, key) and value:
                     setattr(self, key, value)
+
+    def set_theme(self, theme: str):
+        self.theme = theme
+
+    def set_verse(self, verse: str):
+        self.verse = verse
+
+
