@@ -422,6 +422,7 @@ def announcement_form():
                         type="date",
                         value=AnnouncementFormState.publish_date,
                         on_change=AnnouncementFormState.set_publish_date,
+                        disabled=AnnouncementFormState.toggle_publish_date_disable
                     ),
                 ),
                 rx.vstack(
@@ -430,6 +431,13 @@ def announcement_form():
                         type="date",
                         value=AnnouncementFormState.expire_date,
                         on_change=AnnouncementFormState.set_expire_date,
+                        disabled=AnnouncementFormState.toggle_expire_date_disable,
+                        border="1px solid",
+                        border_color=rx.cond(
+                            AnnouncementFormState.is_expire_date_greater_than_publish_date,
+                            "white",
+                            "#FF0000",
+                        )
                     ),
                 ),
             ),

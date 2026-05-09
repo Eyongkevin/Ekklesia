@@ -154,6 +154,10 @@ class AnnouncementFormState(rx.State):
     new_link: str = ""
     new_link_title: str = ""
 
+    # Checks
+    is_expire_date_greater_than_publish_date: bool = True
+
+
     async def submit(self):
         from app.states.auth import AuthState
 
@@ -163,29 +167,39 @@ class AnnouncementFormState(rx.State):
         church_state: ChurchState = await self.get_state(ChurchState)
         church_id = church_state.church.get('id')
 
-        announcement_service.submit(
-            id=self.id,
-            title=self.title,
-            content=self.content,
-            is_pinned=self.pin_to_top,
-            links=self.links,
-            status=self.status,
-            publish_at=self.publish_date if self.publish_date else None,
-            expire_at=self.expire_date if self.expire_date else None,
-            tags=self.tags,
-            audiences=self.audiences,
-            created_by=created_by,
-            church_id=church_id
-        )
+        if not self.is_publish_date_greater_than_today_for_scheduled:
+            yield rx.toast.error("Publish date cannot be today or in the past for Scheduled announcements")
+            return
+        if not self.is_expire_date_greater_than_publish_date:
+            yield rx.toast.error("Expire date cannot be same or before publish date")
+            return
+    
+        try:
+            announcement_service.submit(
+                id=self.id,
+                title=self.title,
+                content=self.content,
+                is_pinned=self.pin_to_top,
+                links=self.links,
+                status=self.status,
+                publish_at=self.publish_date if self.publish_date else None,
+                expire_at=self.expire_date if self.expire_date else None,
+                tags=self.tags,
+                audiences=self.audiences,
+                created_by=created_by,
+                church_id=church_id
+            )
 
-        if self.id:
-            yield rx.toast.success("Announcement updated")
-        else:
-            yield rx.toast.success("Announcement created")
+            if self.id:
+                yield rx.toast.success("Announcement updated")
+            else:
+                yield rx.toast.success("Announcement created")
 
-        announcement_list_state = await self.get_state(AnnouncementListState)
-        await announcement_list_state.paginated_announcements()
-        self.reset_form()
+            announcement_list_state = await self.get_state(AnnouncementListState)
+            await announcement_list_state.paginated_announcements()
+            self.reset_form()
+        except Exception as e:
+            yield rx.toast.error(f"Error submitting announcement")
 
     def toggle_link_popup(self):
         self.show_link_popup = not self.show_link_popup
@@ -226,9 +240,6 @@ class AnnouncementFormState(rx.State):
     def set_title(self, value: str):
         self.title = value
 
-    def set_status(self, value: str):
-        self.status = value
-
     def set_pin_to_top(self, value: bool):
         self.pin_to_top = value
 
@@ -237,10 +248,20 @@ class AnnouncementFormState(rx.State):
 
     def set_expire_date(self, value: str):
         self.expire_date = value
+        self.is_expire_date_greater_than_publish_date = (
+            self.publish_date is None or self.expire_date is None or self.expire_date > self.publish_date
+        )
+
+    @rx.var
+    def is_publish_date_greater_than_today_for_scheduled(self) -> bool:
+        if self.status.strip() == "Scheduled":
+            today_str = str(date.today())
+            return self.publish_date is not None and self.publish_date > today_str
+        return True
 
     @rx.var
     def is_max_links_reached(self) -> bool:
-        return len(self.links) >= self.max_links 
+        return len(self.links) >= self.max_links
 
     @rx.var
     def get_title_len(self) -> int:
@@ -249,6 +270,14 @@ class AnnouncementFormState(rx.State):
     @rx.var
     def toggle_submit_disable(self) -> bool:
         return len(self.title) < 2
+    
+    @rx.var
+    def toggle_publish_date_disable(self) -> bool:
+        return self.status.strip() == 'Draft' or self.status.strip() == "Published"
+    
+    @rx.var
+    def toggle_expire_date_disable(self) -> bool:
+        return self.status.strip() == 'Draft'
 
     @rx.event
     def reset_form(self):
@@ -260,10 +289,13 @@ class AnnouncementFormState(rx.State):
 
     @rx.event
     def set_status(self, status: str):
+        self.is_expire_date_greater_than_publish_date = True
+
         self.status = status
-        if self.status == 'Draft' or self.status == "Scheduled":
+        if self.status.strip() == 'Draft' or self.status.strip() == "Scheduled":
             self.publish_date = ""
-        elif self.status == 'Published':
+            self.expire_date = ""
+        elif self.status.strip() == 'Published':
             self.publish_date = str(date.today())
 
 class AnnouncementTagState(rx.State):

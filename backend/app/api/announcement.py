@@ -13,7 +13,6 @@ def create(announcement: schema_announcement.AnnouncementCreate, uow: UnitOfWork
 
 @router.put("/{announcement_id}/")
 def update(announcement_id: str, announcement: schema_announcement.AnnouncementUpdate, uow: UnitOfWork = Depends(get_db)) -> schema_announcement.Announcement:
-    # import pdb; pdb.set_trace()
     return service_announcement.AnnouncementService(uow).update(announcement_id, announcement)
 
 @router.delete("/{announcement_id}/", status_code=http_status.HTTP_204_NO_CONTENT)
