@@ -9,6 +9,7 @@ from app.states.announcement import (
 from app.states.status import StatusState
 from app.states.audience import AudienceState
 from app.pages.components.form_label import form_label
+from app.pages.components.view_announcement import announcement_view_modal
 from app.utils import get_short_desc
 
 
@@ -453,9 +454,17 @@ def announcement_form():
                     align="center",
                 ),
                 rx.button(
-                    "Submit",
+                    rx.cond(
+                        AnnouncementFormState.id,
+                        "Update",
+                        "Create"
+                    ),
+                    bg = rx.cond(
+                        AnnouncementFormState.id,
+                        "blue.600",
+                        "#10b981",
+                    ),
                     on_click=AnnouncementFormState.submit,
-                    bg="#10b981",
                     color="white",
                     padding="0.8em 1.2em",
                     border_radius="10px",
@@ -527,7 +536,7 @@ def announcement_table_header():
         border_bottom="1px solid #eaeaea",
     )
 
-def announcement_actions_menu(announcement_id: int):
+def announcement_actions_menu(announcement):
     return rx.menu.root(
         rx.menu.trigger(
             rx.text("⋮", font_size="22px", cursor="pointer"),
@@ -535,11 +544,11 @@ def announcement_actions_menu(announcement_id: int):
         rx.menu.content(
             rx.menu.item(
                 "View",
-                on_click=lambda: AnnouncementListState.toggle_select(announcement_id),
+                on_click=lambda: AnnouncementListState.open_view_modal(announcement),
             ),
             rx.menu.item(
                 "Edit",
-                on_click=lambda: AnnouncementListState.toggle_select(announcement_id),
+                on_click=lambda: AnnouncementListState.update_announcement(announcement),
             ),
             rx.menu.sub(
                 rx.menu.sub_trigger("Toggle Options"),
@@ -551,7 +560,7 @@ def announcement_actions_menu(announcement_id: int):
             rx.menu.separator(),
             rx.menu.item(
                 "Delete",
-                on_click=lambda: AnnouncementListState.toggle_select(announcement_id),
+                on_click=lambda: AnnouncementListState.delete_announcement(announcement["id"]),
                 color="red",
             ),
         ),
@@ -692,7 +701,11 @@ def announcement_row(announcement):
 
         # ⚙️ Actions
         rx.box(
-            announcement_actions_menu(announcement["id"]),
+            rx.fragment(
+                announcement_actions_menu(announcement),
+                announcement_view_modal(),
+            ),
+            
             text_align="right",
         ),
 

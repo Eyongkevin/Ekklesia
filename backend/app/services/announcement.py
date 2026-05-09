@@ -3,7 +3,7 @@ from app.db.uow import UnitOfWork
 from app.core.schemas import announcement as schema_announcement
 from app.services import audience as audience_service
 from app.services import status as status_service
-from app.models.announcement import AnnouncementStatus
+from app.models.announcement import AnnouncementStatus, Announcement
 
 
 # CHURCH
@@ -28,6 +28,46 @@ class AnnouncementService:
             audiences=audiences,
             status_id=status.id
         )
+    
+    def update(self, announcement_id: str, data: schema_announcement.AnnouncementUpdate) -> Announcement:
+        # First, check if the announcement exists
+        existing_announcement = self.announcement_crud.get_by_id(announcement_id)
+
+        # Update simple fields
+        simple_fields = ['title', 'content', 'publish_at', 'expire_at', 'is_pinned']
+        for field in simple_fields:
+            value = getattr(data, field)
+            # if value is not None:
+            setattr(existing_announcement, field, value)
+        
+        # If links are being updated, update them
+        if data.links is not None:
+            existing_announcement.links = [
+                link.model_dump() for link in data.links
+            ]
+
+        # If status is being updated, get the new status
+        if data.status:
+            status: AnnouncementStatus = status_service.StatusService(self.uow).get_status_by_name(data.status)
+            existing_announcement.status = status
+            if status.name == "Draft":
+                existing_announcement.publish_at = None
+        
+        # If tags are being updated, get the new tags
+        if data.tags is not None:
+            tags = AnnouncementTagService(self.uow).get_tags_by_names(data.tags)
+            existing_announcement.tags = tags
+
+        # If audiences are being updated, get the new audiences
+        if data.audiences is not None:
+            audiences = audience_service.AudienceService(self.uow).get_audiences_by_names(data.audiences)
+            existing_announcement.audiences = audiences
+        
+        return self.announcement_crud.update(existing_announcement)
+    
+    def delete(self, announcement_id: str) -> None:
+        announcement = self.announcement_crud.get_by_id(announcement_id)
+        self.announcement_crud.delete(announcement)
     
     def get_announcements(self, 
                     church_id: str,

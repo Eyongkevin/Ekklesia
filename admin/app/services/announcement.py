@@ -11,6 +11,7 @@ def get_tags():
     return response.json()
 
 def submit(
+    id: Optional[str],
     title: str,
     content: str,
     is_pinned: bool,
@@ -24,21 +25,43 @@ def submit(
     audiences: Optional[list[str]] = None
     ):
 
-    response = httpx.post(f"{settings.BASE_URL}/announcements/", json={
-        "title": title,
-        "content": content,
-        "is_pinned": is_pinned,
-        "status": status,
-        "links": links,
-        "created_by": created_by,
-        "church_id": church_id,
-        "publish_at": publish_at,
-        "expire_at": expire_at,
-        "tags": tags,
-        "audiences": audiences
-    })
-    response.raise_for_status()
+    if id:
+        # Update existing announcement
+        response = httpx.put(f"{settings.BASE_URL}/announcements/{id}/", json={
+            "title": title,
+            "content": content,
+            "is_pinned": is_pinned,
+            "status": status,
+            "links": links,
+            "created_by": created_by,
+            "church_id": church_id,
+            "publish_at": publish_at,
+            "expire_at": expire_at,
+            "tags": tags,
+            "audiences": audiences
+        })
+    else:
+        # Create new announcement
+        response = httpx.post(f"{settings.BASE_URL}/announcements/", json={
+            "title": title,
+            "content": content,
+            "is_pinned": is_pinned,
+            "status": status,
+            "links": links,
+            "created_by": created_by,
+            "church_id": church_id,
+            "publish_at": publish_at,
+            "expire_at": expire_at,
+            "tags": tags,
+            "audiences": audiences
+        })
+        response.raise_for_status()
+
     return response.json()
+
+def delete(announcement_id: str) -> None:
+    response = httpx.delete(f"{settings.BASE_URL}/announcements/{announcement_id}/")
+    response.raise_for_status()
 
 def get_announcements(
     church_id: str,

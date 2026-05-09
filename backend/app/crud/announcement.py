@@ -42,6 +42,19 @@ class AnnouncementCRUD:
         self.db.commit()
         self.db.refresh(announcement)
         return schema_announcement.Announcement.model_validate(announcement)
+
+    def get_by_id(self, announcement_id: uuid.UUID) -> Announcement:
+        announcement = self.db.query(Announcement).get(announcement_id)
+        return announcement
+    
+    def update(self, announcement: Announcement) -> schema_announcement.Announcement:
+        self.db.commit()
+        self.db.refresh(announcement)
+        return announcement
+    
+    def delete(self, announcement: Announcement) -> None:
+        self.db.delete(announcement)
+        self.db.commit()
     
     def get_announcements(self, 
                     church_id: str,

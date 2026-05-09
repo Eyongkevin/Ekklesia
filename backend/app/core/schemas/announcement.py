@@ -14,7 +14,9 @@ class StatusBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class AnnouncementStatus(StatusBase):
-    pass
+    id: uuid.UUID
+    created_at: datetime
+    modified_at: datetime
 
 # TAGS
 class AnnouncementTagBase(BaseModel):
@@ -65,6 +67,17 @@ class AnnouncementCreate(AnnouncementBase):
     links: list[Link] = Field(default_factory=list)
     tags: list[str] = Field(default_factory=list)
     audiences: list[str] = Field(default_factory=list)
+    publish_at: Optional[date] = None
+    expire_at: Optional[date] = None
+
+class AnnouncementUpdate(BaseModel):
+    title: Optional[str] = None
+    status: Optional[str] = None
+    content: Optional[str] = None
+    links: Optional[list[Link]] = None
+    is_pinned: Optional[bool] = None
+    tags: Optional[list[str]] = None
+    audiences: Optional[list[str]] = None
     publish_at: Optional[date] = None
     expire_at: Optional[date] = None
 

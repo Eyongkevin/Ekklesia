@@ -129,10 +129,14 @@ class AnnouncementState(rx.State):
         self.show_add_update_drawer = True
 
     @rx.event
-    def close_add_update_drawer(self):
+    async def close_add_update_drawer(self):
         self.show_add_update_drawer = False
+        form_state = await self.get_state(AnnouncementFormState)
+        form_state.reset_form()
+
 
 class AnnouncementFormState(rx.State):
+    id: str = ""
     title: str = ""
     max_title_len: int = 100
     status: str = "Draft"
@@ -160,21 +164,28 @@ class AnnouncementFormState(rx.State):
         church_id = church_state.church.get('id')
 
         announcement_service.submit(
+            id=self.id,
             title=self.title,
             content=self.content,
             is_pinned=self.pin_to_top,
             links=self.links,
             status=self.status,
-            publish_at=self.publish_date,
-            expire_at=self.expire_date,
+            publish_at=self.publish_date if self.publish_date else None,
+            expire_at=self.expire_date if self.expire_date else None,
             tags=self.tags,
             audiences=self.audiences,
             created_by=created_by,
             church_id=church_id
         )
 
-        self.reset_form()
+        if self.id:
+            yield rx.toast.success("Announcement updated")
+        else:
+            yield rx.toast.success("Announcement created")
 
+        announcement_list_state = await self.get_state(AnnouncementListState)
+        await announcement_list_state.paginated_announcements()
+        self.reset_form()
 
     def toggle_link_popup(self):
         self.show_link_popup = not self.show_link_popup
@@ -226,7 +237,6 @@ class AnnouncementFormState(rx.State):
 
     def set_expire_date(self, value: str):
         self.expire_date = value
-
 
     @rx.var
     def is_max_links_reached(self) -> bool:
@@ -311,6 +321,50 @@ class AnnouncementListState(rx.State):
     selected_ids: set[int] = set()
 
     open_menu_id: int | None = None
+
+    show_view_modal: bool = False
+    selected_announcement: Optional[AnnouncementType] = None
+
+    @rx.event
+    def open_view_modal(self, announcement: AnnouncementType):
+        self.selected_announcement = announcement
+        self.show_view_modal = True
+
+    @rx.event
+    def close_view_modal(self):
+        self.selected_announcement = None
+        self.show_view_modal = False
+
+    @rx.event
+    async def delete_announcement(self, announcement_id: str):
+        announcement_service.delete(announcement_id)
+        self.show_view_modal = False
+        yield rx.toast.success("Announcement deleted")
+
+        await self.paginated_announcements()
+
+    @rx.event
+    async def update_announcement(self, announcement: AnnouncementType):
+        #TODO: Open add form drawer with pre-filled data, then submit to backend
+        form_state = await self.get_state(AnnouncementFormState)
+        form_state.id = announcement["id"]
+        form_state.title = announcement["title"]
+        form_state.content = announcement["content"]
+        form_state.status = announcement["status"]["name"]
+        form_state.pin_to_top = announcement["is_pinned"]
+        if announcement["publish_at"]:
+            form_state.publish_date = announcement["publish_at"][:10]
+        if announcement["expire_at"]:
+            form_state.expire_date = announcement["expire_at"][:10]
+        form_state.tags = [tag["name"] for tag in announcement["tags"]]
+        form_state.audiences = [audience["name"] for audience in announcement["audiences"]]
+        form_state.links = announcement["links"]
+
+        announcement_state = await self.get_state(AnnouncementState)
+
+        self.show_view_modal = False
+        announcement_state.show_add_update_drawer = True
+
 
     def toggle_menu(self, announcement_id: int):
         if self.open_menu_id == announcement_id:
