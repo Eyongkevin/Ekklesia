@@ -72,6 +72,13 @@ class Announcement(Base):
         back_populates="announcements"
     )
 
+    creator: Mapped["User"] = relationship(
+        "User",
+        foreign_keys=[created_by],
+        # back_populates="announcements",
+        viewonly=True,
+    )
+
     tags: Mapped[list["AnnouncementTag"]] = relationship(
         secondary=announcement_tag_link,
         back_populates="announcements"

@@ -12,7 +12,7 @@ def dashboard_page():
             dashboard_sidebar(),
             dashboard_content(),
             position="absolute",
-            top="80px",
+            top="1px",
             left="0",
             right="0",
             bottom="0",

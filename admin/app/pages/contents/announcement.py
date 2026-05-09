@@ -1,9 +1,16 @@
 import reflex as rx
 
-from app.states.announcement import AnnouncementState, AnnouncementFormState, AnouncementTagState
+from app.states.announcement import (
+    AnnouncementFilterState,
+    AnnouncementListState,
+    AnnouncementState, 
+    AnnouncementFormState, 
+    AnnouncementTagState)
 from app.states.status import StatusState
 from app.states.audience import AudienceState
 from app.pages.components.form_label import form_label
+from app.pages.components.view_announcement import announcement_view_modal
+from app.utils import get_short_desc
 
 
 def church_announcement_card():
@@ -12,7 +19,15 @@ def church_announcement_card():
             rx.flex(
                 announcement_add_buttons(),
                 width="100%",
+                padding="1em",
             ),
+            announcement_filters(),
+            rx.flex(
+                announcement_list(),
+                padding="1em",
+                width="100%",
+            ),
+            
             padding="2em",
             background="#f5f7fb",
             width=rx.cond(
@@ -248,7 +263,7 @@ def links_section():
     )
 
 def tags_section():
-    available_tags = AnouncementTagState.get_tags_name
+    available_tags = AnnouncementTagState.get_tags_name
 
     return rx.box(
         rx.text("Tags", font_weight="bold", size='1'),
@@ -407,6 +422,7 @@ def announcement_form():
                         type="date",
                         value=AnnouncementFormState.publish_date,
                         on_change=AnnouncementFormState.set_publish_date,
+                        disabled=AnnouncementFormState.toggle_publish_date_disable
                     ),
                 ),
                 rx.vstack(
@@ -415,6 +431,13 @@ def announcement_form():
                         type="date",
                         value=AnnouncementFormState.expire_date,
                         on_change=AnnouncementFormState.set_expire_date,
+                        disabled=AnnouncementFormState.toggle_expire_date_disable,
+                        border="1px solid",
+                        border_color=rx.cond(
+                            AnnouncementFormState.is_expire_date_greater_than_publish_date,
+                            "white",
+                            "#FF0000",
+                        )
                     ),
                 ),
             ),
@@ -439,9 +462,17 @@ def announcement_form():
                     align="center",
                 ),
                 rx.button(
-                    "Submit",
+                    rx.cond(
+                        AnnouncementFormState.id,
+                        "Update",
+                        "Create"
+                    ),
+                    bg = rx.cond(
+                        AnnouncementFormState.id,
+                        "blue.600",
+                        "#10b981",
+                    ),
                     on_click=AnnouncementFormState.submit,
-                    bg="#10b981",
                     color="white",
                     padding="0.8em 1.2em",
                     border_radius="10px",
@@ -458,3 +489,282 @@ def announcement_form():
         ),
         padding="1em",
     )
+
+def announcement_filters():
+    return rx.box(
+        rx.flex(
+            rx.input(
+                placeholder="🔍 Search announcements...",
+                value=AnnouncementFilterState.search,
+                on_change=AnnouncementFilterState.set_search,
+                width="260px",
+            ),
+
+            rx.select(
+                StatusState.get_status_names,
+                value=AnnouncementFilterState.status,
+                on_change=AnnouncementFilterState.set_status,
+            ),
+
+            rx.select(
+                AudienceState.get_audience_name,
+                value=AnnouncementFilterState.audience,
+                on_change=AnnouncementFilterState.set_audience,
+            ),
+
+            rx.select(
+                AnnouncementTagState.get_tags_name,
+                value=AnnouncementFilterState.tag,
+                on_change=AnnouncementFilterState.set_tag,
+            ),
+
+            justify="between",
+            width="70%",
+            wrap="wrap",
+            spacing="4",
+        ),
+
+        bg="white",
+        padding="20px",
+        border_radius="12px",
+        box_shadow="sm",
+    )
+
+def announcement_table_header():
+    return rx.hstack(
+        rx.checkbox(
+            on_change=lambda _: AnnouncementListState.select_all()
+        ),
+        rx.text("Announcement", font_weight="bold", width="40%"),
+        rx.text("Status", font_weight="bold", width="10%"),
+        rx.text("Created By", font_weight="bold", width="10%"),
+        rx.text("Published Date", font_weight="bold", width="20%"),
+        rx.text("Actions", font_weight="bold", width="15%"),
+        padding="0.75em",
+        border_bottom="1px solid #eaeaea",
+    )
+
+def announcement_actions_menu(announcement):
+    return rx.menu.root(
+        rx.menu.trigger(
+            rx.text("⋮", font_size="22px", cursor="pointer"),
+        ),
+        rx.menu.content(
+            rx.menu.item(
+                "View",
+                on_click=lambda: AnnouncementListState.open_view_modal(announcement),
+            ),
+            rx.menu.item(
+                "Edit",
+                on_click=lambda: AnnouncementListState.update_announcement(announcement),
+            ),
+            rx.menu.sub(
+                rx.menu.sub_trigger("Toggle Options"),
+                rx.menu.sub_content(
+                    rx.menu.item("Activate"),
+                    rx.menu.item("Pin to Top"),
+                ),
+            ),
+            rx.menu.separator(),
+            rx.menu.item(
+                "Delete",
+                on_click=lambda: AnnouncementListState.delete_announcement(announcement["id"]),
+                color="red",
+            ),
+        ),
+    )
+
+def tag_badge(tag: dict[str, str | bool]):
+    return rx.box(
+        tag.get('name', '-'),
+        padding="2px 8px",
+        border_radius="12px",
+        font_size="8px",
+        bg="#e8f0fe",
+        color="#137333",
+        margin_right="4px",
+    )
+
+link_badge = lambda link: rx.box(
+    rx.link(
+        link['title'],
+            href=link['url'],
+            is_external=True,
+            #color="#2563eb",
+        ),
+        padding="2px 8px",
+        border_radius="12px",
+        font_size="8px",
+        bg="#e6f4ea",
+        color="#1a73e8",
+        margin_right="4px",
+)
+
+def audience_badge(audience: dict[str, str | bool]):
+    return rx.box(
+        audience.get('name', '-'),
+        padding="2px 8px",
+        border_radius="12px",
+        font_size="8px",
+        bg="#e6f4ea",
+        color="#010101",
+        margin_right="4px",
+    )
+
+def get_announcement_item_name(item)-> str:
+    return rx.cond(
+        item,
+        item['name'],
+        "-"
+    )
+
+def announcement_row(announcement):
+    short_desc = get_short_desc(announcement["content"], 100)
+    return rx.hstack(
+        # ✅ Checkbox
+        rx.checkbox(
+            checked=AnnouncementListState.selected_ids.contains(announcement["id"]),
+            on_change=lambda _: AnnouncementListState.toggle_select(announcement["id"]),
+        ),
+
+        # 📄 Announcement (title + description)
+        rx.box(
+            rx.text(
+                announcement["title"],
+                font_weight="600",
+                font_size="14px",
+            ),
+            rx.text(
+                short_desc,
+                font_size="13px",
+                color="gray",
+                no_of_lines=2,
+            ),
+            # Tags, audience and links section
+            rx.hstack(
+                rx.icon("tags", size=12, color="gray"),
+                rx.foreach(
+                    announcement["tags"],
+                    tag_badge,
+                ),
+                rx.icon("users", size=12, color="gray"),
+                rx.foreach(
+                    announcement["audiences"],
+                    audience_badge,
+                ),
+                rx.icon("link_2", size=12, color="gray"),
+                rx.foreach(
+                    announcement["links"],
+                    link_badge,
+                ),
+                wrap="wrap",
+                spacing="1",
+            ),
+            width="40%",
+        ),
+
+        # 📌 Status
+        rx.box(
+            rx.badge(
+                get_announcement_item_name(announcement["status"]),
+                color_scheme=rx.match(
+                    get_announcement_item_name(announcement["status"]),
+                    ("Published", "green"),
+                    ("Draft", "gray"),
+                    ("Expired", "red"),
+                    ("Scheduled", "blue"),
+                    "yellow",  # default
+                ),
+            ),
+            width="10%",
+        ),
+        # 📅 Created By
+        rx.box(
+            rx.text(
+                rx.cond(
+                    announcement["creator"],
+                    announcement["creator"]["first_name"],
+                    "-"
+                ),
+                font_size="13px",
+            ),
+            width="10%",
+        ),
+
+        # 📅 Published Date
+        rx.box(
+            rx.text(
+                rx.cond(
+                    announcement["publish_at"],
+                    rx.moment(
+                        announcement["publish_at"],
+                        format="MMM D, YYYY",
+                    ),
+                    "-"
+                ),
+                font_size="13px",
+            ),
+            width="20%",
+        ),
+
+        # ⚙️ Actions
+        rx.box(
+            rx.fragment(
+                announcement_actions_menu(announcement),
+                announcement_view_modal(),
+            ),
+            
+            text_align="right",
+        ),
+
+        padding="0.75em",
+        align="center",
+        border_bottom="1px solid #f1f1f1",
+    )
+
+def announcement_table():
+    return rx.box(
+        announcement_table_header(),
+
+        rx.foreach(
+            AnnouncementListState.announcements,
+            announcement_row,
+        ),
+        width="100%",
+        border="1px solid #eaeaea",
+        border_radius="10px",
+        overflow="hidden",
+        bg="white",
+    )
+
+def pagination_controls():
+    return rx.hstack(
+        rx.button(
+            "Previous",
+            on_click=AnnouncementListState.prev_page,
+            disabled=AnnouncementListState.page == 1,
+        ),
+
+        rx.text(
+            f"Page {AnnouncementListState.page} of {AnnouncementListState.total_pages}"
+        ),
+
+        rx.button(
+            "Next",
+            on_click=AnnouncementListState.next_page,
+            disabled=AnnouncementListState.page == AnnouncementListState.total_pages,
+        ),
+
+        justify="end",
+        width="100%",
+        padding_top="1em",
+    )
+
+def announcement_list():
+    return rx.vstack(
+        announcement_table(),
+        pagination_controls(),
+        width="100%",
+        spacing="4",
+    )
+

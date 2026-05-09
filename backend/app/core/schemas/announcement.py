@@ -4,6 +4,8 @@ import uuid
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, Field, field_serializer
 
+from app.core.schemas.user import UserAnnouncement
+
 # STATUS
 class StatusBase(BaseModel):
     name: str
@@ -12,7 +14,9 @@ class StatusBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class AnnouncementStatus(StatusBase):
-    pass
+    id: uuid.UUID
+    created_at: datetime
+    modified_at: datetime
 
 # TAGS
 class AnnouncementTagBase(BaseModel):
@@ -66,6 +70,17 @@ class AnnouncementCreate(AnnouncementBase):
     publish_at: Optional[date] = None
     expire_at: Optional[date] = None
 
+class AnnouncementUpdate(BaseModel):
+    title: Optional[str] = None
+    status: Optional[str] = None
+    content: Optional[str] = None
+    links: Optional[list[Link]] = None
+    is_pinned: Optional[bool] = None
+    tags: Optional[list[str]] = None
+    audiences: Optional[list[str]] = None
+    publish_at: Optional[date] = None
+    expire_at: Optional[date] = None
+
 
 class Announcement(AnnouncementBase):
     id: uuid.UUID
@@ -74,6 +89,7 @@ class Announcement(AnnouncementBase):
     tags: list[AnnouncementTag] = Field(default_factory=list)
     audiences: list[AnnouncementAudience] = Field(default_factory=list)
     status: AnnouncementStatus
+    creator: UserAnnouncement
     publish_at: Optional[date] = None
     expire_at: Optional[date] = None
     created_at: datetime

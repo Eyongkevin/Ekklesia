@@ -7,6 +7,12 @@ class ChurchState(rx.State):
     churches: list[dict] = []
     contact: dict[str, str] = {}
 
+    def set_church(self, value: str):
+        self.church = value
+
+    def set_name(self, value: str):
+        self.name = value
+
     @rx.var
     def get_church_name(self) -> str:
         return self.church.get('name', '')

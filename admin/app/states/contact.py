@@ -79,3 +79,34 @@ class ContactFormState(rx.State):
             for key, value in contact.items():
                 if hasattr(self, key) and value:
                     setattr(self, key, value)
+    
+    def set_country(self, value: str):
+        self.country = value
+
+    def set_city(self, value: str):
+        self.city = value
+
+    def set_address_line(self, value: str):
+        self.address_line = value   
+
+    def set_phone_1(self, value: str):
+        self.phone_1 = value
+
+    def set_phone_2(self, value: str):
+        self.phone_2 = value
+
+    def set_email(self, value: str):
+        self.email = value
+
+    def set_facebook(self, value: str):
+        self.facebook = value
+
+    def set_youtube(self, value: str):
+        self.youtube = value
+    
+    def set_instagram(self, value: str):
+        self.instagram = value
+
+    def set_website(self, value: str):
+        self.website = value
+
