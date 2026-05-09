@@ -347,7 +347,7 @@ class AnnouncementListState(rx.State):
     announcements: list[AnnouncementType] = []  # fetched from backend
 
     page: int = 1
-    per_page: int = 3
+    per_page: int = 10
     total_pages: int = 1
 
     selected_ids: set[int] = set()
