@@ -485,7 +485,7 @@ def church_profile_card():
 def labeled_input(label, placeholder, state, state_func=None):
     return rx.vstack(
         rx.text(label, font_size="0.9em", font_weight="500"),
-        rx.input(placeholder=placeholder, value=state, on_change=state_func),
+        rx.input(placeholder=placeholder, value=state, on_change=state_func, width="100%",),
         align="start",
         spacing="1",
         width="100%",
@@ -494,7 +494,7 @@ def labeled_input(label, placeholder, state, state_func=None):
 def labeled_textarea(label, placeholder, state, state_func=None, focus=False):
     return rx.vstack(
         rx.text(label, font_size="0.9em", font_weight="500"),
-        rx.text_area(placeholder=placeholder, value=state, on_change=state_func, auto_focus=focus),
+        rx.text_area(placeholder=placeholder, value=state, on_change=state_func, auto_focus=focus, width="80%",),
         align="start",
         spacing="1",
         width="100%",
@@ -529,15 +529,15 @@ def contact_modal():
                     ),
 
                     rx.hstack(
-                        rx.input(placeholder="YouTube", value=contact_states.ContactFormState.youtube, on_change=contact_states.ContactFormState.set_youtube),
-                        rx.input(placeholder="Facebook", value=contact_states.ContactFormState.facebook, on_change=contact_states.ContactFormState.set_facebook),
+                        rx.input(placeholder="YouTube", value=contact_states.ContactFormState.youtube, on_change=contact_states.ContactFormState.set_youtube, width="50%",),
+                        rx.input(placeholder="Facebook", value=contact_states.ContactFormState.facebook, on_change=contact_states.ContactFormState.set_facebook, width="50%",),
                         spacing="3",
                         width="100%",
                     ),
 
                     rx.hstack(
-                        rx.input(placeholder="Instagram", value=contact_states.ContactFormState.instagram, on_change=contact_states.ContactFormState.set_instagram),
-                        rx.input(placeholder="Website", value=contact_states.ContactFormState.website, on_change=contact_states.ContactFormState.set_website),
+                        rx.input(placeholder="Instagram", value=contact_states.ContactFormState.instagram, on_change=contact_states.ContactFormState.set_instagram, width="50%",),
+                        rx.input(placeholder="Website", value=contact_states.ContactFormState.website, on_change=contact_states.ContactFormState.set_website,  width="50%",),
                         spacing="3",
                         width="100%",
                     ),
