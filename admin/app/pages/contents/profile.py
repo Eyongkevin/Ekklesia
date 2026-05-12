@@ -83,11 +83,37 @@ def profile_section():
                 object_fit="cover",
             ),
             rx.box(
-                rx.text(
-                    church_states.ChurchState.get_church_name,
-                    color="white",
-                    font_weight="bold",
-                    font_size="1.2em",
+                rx.hstack(
+                    rx.image(
+                        src="https://static.vecteezy.com/system/resources/thumbnails/023/515/041/small/book-church-logo-design-icon-bible-church-logo-design-cross-and-holy-bible-logo-free-vector.jpg",
+                        width="10%",
+                        height="10%",
+                        border_radius="50%",
+                        border="3px solid white",
+                        object_fit="cover",
+                        box_shadow="0 4px 20px rgba(0,0,0,0.25)"
+                    ),
+                    rx.vstack(
+                        rx.text(
+                            church_states.ChurchState.get_church_name,
+                            color="white",
+                            font_weight="bold",
+                            font_size="2.0em",
+                        ),
+                        rx.hstack(
+                            rx.icon("map-pin", size=28, color="gray"),
+                            rx.text(
+                                f"{contact_states.ContactState.city} {contact_states.ContactState.address_line}, {contact_states.ContactState.country}",
+                                color="gray",
+                                font_size="1.3em",
+                            ),
+                        )
+                    ),
+                    spacing="5",
+                    align="center",
+                    padding_bottom="2em",
+                    padding_left="1em",
+
                 ),
                 position="absolute",
                 bottom="0",
@@ -95,6 +121,7 @@ def profile_section():
                 padding="1em",
                 background="linear-gradient(to top, rgba(0,0,0,0.7), transparent)",
             ),
+            
             position="relative",
             height="220px",
             width="100%",
@@ -268,7 +295,8 @@ def church_profile_card():
             wrap="wrap",
             spacing="6",
         ),
-        padding="2em",
+        padding="1em",
+        padding_top="3em",
         background="#f5f7fb",
         min_height="100vh",
     )
