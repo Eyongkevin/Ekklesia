@@ -22,6 +22,9 @@ class ChurchCRUD:
     def get_church_by_id(self, church_id: str):
         church = self.db.query(Church).options(selectinload(Church.themes), with_loader_criteria(ChurchTheme, ChurchTheme.year == date.today().year)).filter(Church.id == church_id).first()
         return church_schema.Church.model_validate(church) if church else None
+    
+    def get_church_code(self, church_id: str) -> str | None:
+        return self.db.query(Church.code).filter(Church.id==church_id).scalar()
 
     def get_churches(self):
         return self.db.query(Church).all()

@@ -1,3 +1,6 @@
+from typing import Optional
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 from app.models.invite_code import InviteCode
 
@@ -12,10 +15,11 @@ class InviteCRUD:
             InviteCode.is_active == True
     ).first()
 
-    def create_invite_code(self, code: str, church_id: str):
+    def create_invite_code(self, code: str, church_id: str, expires_at: Optional[datetime] = None):
         invite = InviteCode(
             code=code,
-            church_id=church_id
+            church_id=church_id,
+            expires_at=expires_at
         )
 
         self.db.add(invite)
