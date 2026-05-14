@@ -39,4 +39,4 @@ class InviteCode(Base):
     )
 
     def __repr__(self) -> str:
-        return f'<InviteCode {self.code} for Church {self.church_id.name}>'
+        return f'<InviteCode {self.code}>'

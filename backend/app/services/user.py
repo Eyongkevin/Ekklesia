@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from app.services.membership import MembershipService
 from app.crud.user import UserCRUD
 from app.services.invite import InviteService
@@ -23,21 +24,24 @@ class UserService:
         first_name: str | None,
         code: str
     ) -> user_schemas.User:
-        invite = self.invite_service.validate_invite_code(code)
+        invite = self.invite_service.validate_invite_code(code.strip())
         if not invite:
-            raise ValueError("Invalid invite code")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired invite code")
 
         # TODO: Check if user already exists
         #   If user exists, raise an error
         user = self.user_crud.get_user_by_telegram_id(telegram_id)
         if user is None:
-            user = self.user_crud.create_user(telegram_id, first_name, str(invite.church_id))
+            user = self.user_crud.create_user(telegram_id, first_name)
 
         # Check if membership already exists
-        if not self.membership_service.check_membership(str(user.id), str(invite.church_id)):
-            self.membership_service.create_membership(str(user.id), str(invite.church_id))
-
+        if self.membership_service.check_membership(str(user.id), str(invite.church_id)) is False:
+            self.membership_service.create_membership(str(user.id), church_id=str(invite.church_id))
+            # church_name = user.memberships[0].church.name
+            # raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"You already belong to {church_name} church")
+        
         return user
+
     
     def authenticate_user(self, email: str, password: str) -> user_schemas.User | None:
         user: user_schemas.User | None = self.user_crud.get_user_by_email(email)

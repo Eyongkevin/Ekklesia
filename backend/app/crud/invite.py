@@ -1,6 +1,7 @@
 from typing import Optional
 from datetime import datetime
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from app.models.invite_code import InviteCode
 
@@ -12,7 +13,11 @@ class InviteCRUD:
     def get_active_invite_by_code(self, code: str) -> InviteCode | None:
         return self.db.query(InviteCode).filter(
             InviteCode.code == code,
-            InviteCode.is_active == True
+            InviteCode.is_active == True,
+            or_(
+                InviteCode.expires_at.is_(None),
+                InviteCode.expires_at > datetime.now()
+            )
     ).first()
 
     def create_invite_code(self, code: str, church_id: str, expires_at: Optional[datetime] = None):
