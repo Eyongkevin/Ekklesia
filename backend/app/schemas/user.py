@@ -2,7 +2,7 @@ from typing import Optional
 import uuid
 from pydantic import BaseModel, ConfigDict
 
-from app.core.schemas.membership import Membership
+from app.schemas.membership import Membership
 
 class UserBase(BaseModel):
     telegram_id: Optional[str] = None
@@ -11,6 +11,7 @@ class UserBase(BaseModel):
     # model_config = ConfigDict(from_attributes=True)
 
 class InviteUserCreate(UserBase):
+    telegram_id: str
     invite_code: str # FBCA038-SH8EE8 -> church code - suffix code
 
 class User(UserBase):

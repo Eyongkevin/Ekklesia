@@ -1,6 +1,6 @@
-from app.crud.audience import AudienceCRUD
+from app.repositories.audience import AudienceCRUD
 from app.db.uow import UnitOfWork
-from app.core.schemas import announcement as schema_announcement
+from app.models import AnnouncementAudience
 
 
 class AudienceService:
@@ -8,8 +8,8 @@ class AudienceService:
         self.uow = uow
         self.audience_crud = AudienceCRUD(self.uow.db)
 
-    def get_audiences(self)-> list[schema_announcement.AnnouncementAudience]:
+    def get_audiences(self)-> list[AnnouncementAudience]:
         return self.audience_crud.get_audiences()
     
-    def get_audiences_by_names(self, audience_names: list[str]):
+    def get_audiences_by_names(self, audience_names: list[str]) -> list[AnnouncementAudience]:
         return self.audience_crud.get_audiences_by_names(audience_names)

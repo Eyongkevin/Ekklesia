@@ -4,7 +4,7 @@ import uuid
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, Field, field_serializer
 
-from app.core.schemas.user import UserAnnouncement
+from app.schemas.user import UserAnnouncement
 
 # STATUS
 class StatusBase(BaseModel):
@@ -94,3 +94,16 @@ class Announcement(AnnouncementBase):
     expire_at: Optional[date] = None
     created_at: datetime
     modified_at: datetime
+
+class AnnouncementListRes(BaseModel):
+    total: int
+    announcements: list[Announcement]
+
+class AnnouncementFilterOptions(BaseModel):
+    status: str
+    audience: str
+    tag: str
+    search: str
+    is_active: bool = True
+    page: int = 1
+    per_page: int = 10

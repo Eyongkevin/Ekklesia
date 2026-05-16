@@ -4,7 +4,7 @@ import uuid
 
 from sqlalchemy.orm import Session
 from app.models.announcement import Announcement, AnnouncementTag, AnnouncementAudience, AnnouncementStatus
-from app.core.schemas import announcement as schema_announcement
+from app.schemas import announcement as schema_announcement
 
 
 class AnnouncementCRUD:
@@ -24,7 +24,7 @@ class AnnouncementCRUD:
             expire_at: Optional[datetime] = None,
             content: Optional[str] = None,
             links: Optional[list[schema_announcement.Link]] = None,
-    ) -> schema_announcement.Announcement:
+    ) -> Announcement:
         announcement = Announcement(
             title=title,
             content=content,
@@ -39,22 +39,15 @@ class AnnouncementCRUD:
             audiences=audiences
         )
         self.db.add(announcement)
-        self.db.commit()
-        self.db.refresh(announcement)
-        return schema_announcement.Announcement.model_validate(announcement)
 
-    def get_by_id(self, announcement_id: uuid.UUID) -> Announcement:
-        announcement = self.db.query(Announcement).get(announcement_id)
         return announcement
-    
-    def update(self, announcement: Announcement) -> schema_announcement.Announcement:
-        self.db.commit()
-        self.db.refresh(announcement)
+
+    def get_by_id(self, announcement_id: str) -> Announcement | None:
+        announcement = self.db.query(Announcement).get(announcement_id)
         return announcement
     
     def delete(self, announcement: Announcement) -> None:
         self.db.delete(announcement)
-        self.db.commit()
     
     def get_announcements(self, 
                     church_id: str,
@@ -64,7 +57,7 @@ class AnnouncementCRUD:
                     search: str | None = None,
                     is_active: bool = True,
                     offset: int = 0,
-                    limit: int = 10) -> dict[str, list[schema_announcement.Announcement] | int]:
+                    limit: int = 10) -> dict[str, list[Announcement] | int]:
         # TODO: optimize query by limiting with is_active
         query = self.db.query(Announcement).filter(Announcement.church_id == church_id)
         if status:
@@ -80,7 +73,7 @@ class AnnouncementCRUD:
 
         announcements = query.order_by(Announcement.created_at.desc()).offset(offset).limit(limit).all()
         return {
-            "announcements": [schema_announcement.Announcement.model_validate(announcement) for announcement in announcements],
+            "announcements": announcements,
             "total": total
         }
 
@@ -88,9 +81,8 @@ class AnnouncementTagCRUD:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_tags(self) -> list[schema_announcement.AnnouncementTag]:
-        tags = self.db.query(AnnouncementTag).filter(AnnouncementTag.is_active == True).all()
-        return [schema_announcement.AnnouncementTag.model_validate(tag) for tag in tags]
+    def get_tags(self) -> list[AnnouncementTag]:
+        return self.db.query(AnnouncementTag).filter_by(is_active=True).all()
     
     def get_tags_by_names(self, tag_names: list[str]) -> list[AnnouncementTag]:
         return self.db.query(AnnouncementTag).filter(AnnouncementTag.name.in_(tag_names)).all()

@@ -4,12 +4,13 @@ from app.api.deps import get_db
 from app.services.user import UserService
 from app.services.membership import MembershipService
 from app.core.utils import MembershipRole
-from app.core.schemas import user as user_schemas
+from app.schemas import user as user_schemas
 from app.core.security import create_access_token
 from app.db.uow import UnitOfWork
 
 
 router = APIRouter(prefix="/users", tags=["Users_memberships"])
+
 
 
 @router.post("/register", response_model=user_schemas.User)
@@ -20,9 +21,10 @@ def register_user(payload: user_schemas.InviteUserCreate, uow: UnitOfWork = Depe
         code=payload.invite_code
     )
 
+
 @router.post("/login/", response_model=user_schemas.LoginResponse)
 async def login_user(payload: user_schemas.LoginRequest, response: Response, uow: UnitOfWork = Depends(get_db)):
-    user: user_schemas.User | None =  UserService(uow).authenticate_user(
+    user=UserService(uow).authenticate_user(
         email=payload.email,
         password=payload.password
     )
@@ -43,6 +45,7 @@ async def login_user(payload: user_schemas.LoginRequest, response: Response, uow
         "message": "Login successful",
         "user": user
     }
+
 
 @router.get('/memberships/{church_id}/stats')
 def membership_stats(church_id: str, uow: UnitOfWork = Depends(get_db)) -> dict[str, dict[str, int]]:

@@ -1,5 +1,6 @@
-from app.crud.membership import MembershipCRUD
-from app.core.schemas import membership as membership_schemas
+from app.repositories.membership import MembershipCRUD
+from app.schemas import membership as membership_schemas
+from app.models import Membership
 from app.db.uow import UnitOfWork
 from app.core.utils import MembershipRole
 
@@ -24,7 +25,7 @@ class MembershipService:
     def check_is_church_admin(self, user_id: str) -> bool:
         return self.membership_crud.is_church_admin(user_id)
     
-    def user_church_membership(self, user_id: str) -> membership_schemas.Membership | None:
+    def user_church_membership(self, user_id: str) -> Membership | None:
         return self.membership_crud.get_user_church_membership(user_id)
     
     def get_church_membership_stats(self, church_id: str) -> dict[str, dict[str, int]]:
