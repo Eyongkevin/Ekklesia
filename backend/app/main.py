@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.bot.webhook import router as telegram_router
 from app.api import invite, church, user, announcement, status, audience
 from app.admin.dashboard import setup_admin
+from app.core.exceptions.base import AppException
+from app.core.exception_handler import app_exception_handler
 
 
 app = FastAPI()
@@ -23,3 +25,5 @@ app.include_router(announcement.router, prefix="/api/v1")
 app.include_router(status.router, prefix="/api/v1")
 app.include_router(audience.router, prefix="/api/v1")
 setup_admin(app)
+
+app.add_exception_handler(AppException, app_exception_handler)

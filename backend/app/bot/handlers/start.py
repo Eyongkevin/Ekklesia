@@ -1,6 +1,10 @@
 import requests
+import logging
 
 from app.bot.services.telegram import send_message
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def handle_start(message: dict):
@@ -25,9 +29,12 @@ def handle_start(message: dict):
     )
     if response.status_code == 200:
         user = response.json()
+        logger.info('USER:::::: ', user)
         send_message(
             chat_id,
             f"🎉 Welcome {user['first_name']}! You are now registered to {user['memberships'][0]['church']['name']}"
         )
     else:
-        send_message(chat_id, "❌ Registration failed. Please check your invite code and try again.")
+        error_msg = response.json()['detail']
+        send_message(chat_id, f"❌ Registration failed. {error_msg}")
+

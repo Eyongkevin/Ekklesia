@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends
 
 from app.api.deps import get_db
-from app.services import status as status_service
-from app.core.schemas import announcement as schema_announcement
+from app.services import status as status_services
+from app.schemas import announcement as announcement_schemas
 from app.db.uow import UnitOfWork
+
 
 router = APIRouter(prefix="/status", tags=["status"])
 
 
-@router.get("/")
-def tags( uow: UnitOfWork = Depends(get_db)) -> list[schema_announcement.AnnouncementStatus]:
-    return status_service.StatusService(uow).get_statuses()
+
+@router.get("/", response_model=list[announcement_schemas.AnnouncementStatus])
+def tags(uow: UnitOfWork = Depends(get_db)):
+    return status_services.StatusService(uow).get_statuses()

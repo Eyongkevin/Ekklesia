@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.models.membership import Membership
-from app.core.schemas import membership as membership_schemas
+from app.schemas import membership as membership_schemas
 from app.core.utils import MembershipRole
 
 class MembershipCRUD:
@@ -41,12 +41,11 @@ class MembershipCRUD:
             is_active=True
         ).first() is not None
     
-    def get_user_church_membership(self, user_id: str) -> Optional[membership_schemas.Membership]:
-        membership =  self.db.query(Membership).filter_by(
+    def get_user_church_membership(self, user_id: str) -> Optional[Membership]:
+        return self.db.query(Membership).filter_by(
             user_id=user_id,
             is_active=True
         ).first()
-        return membership_schemas.Membership.model_validate(membership) if membership else None
     
     def get_church_membership_role_count(self, church_id: str):
         return (

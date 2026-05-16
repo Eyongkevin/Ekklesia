@@ -4,7 +4,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from datetime import datetime
 
-from app.core.schemas.membership import Membership
+from app.schemas.membership import Membership
 
 password_hasher = PasswordHasher()
 

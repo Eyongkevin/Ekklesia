@@ -1,8 +1,10 @@
+from typing import Optional
 import uuid
-from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, HttpUrl
 
 class InviteBase(BaseModel):
-    church_id: str
+    expires_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -14,6 +16,9 @@ class Invite(InviteBase):
     code: str
     church_id: uuid.UUID
     is_active: bool
-    expires_at: str | None
     created_at: str
     modified_at: str
+
+class InviteRes(BaseModel):
+    code: str
+    link: HttpUrl
