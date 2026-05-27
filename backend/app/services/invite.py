@@ -25,4 +25,7 @@ class InviteService:
     
     def validate_invite_code(self, code: str) -> InviteCode | None:
         return self.invite_crud.get_active_invite_by_code(code)
+    
+    def get_invites(self, church_id: str, is_active: bool = True) -> list[InviteCode]:
+        return self.invite_crud.get_invites(church_id, is_active)
 

@@ -13,6 +13,7 @@ def dashboard_sidebar():
         sidebar_item("Daily Devotion", "book", "devotion"),
         sidebar_item("Projects", "briefcase", "projects"),
         sidebar_item("Q&A", "help-circle", "qa"),
+        sidebar_item("Invites", "send", "invites"),
 
         rx.divider(),
 

@@ -30,3 +30,9 @@ class InviteCRUD:
         self.db.add(invite)
 
         return invite
+
+    def get_invites(self, church_id: str, is_active: bool) -> list[InviteCode]:
+        return self.db.query(InviteCode).filter(
+            InviteCode.church_id == church_id,
+            InviteCode.is_active.is_(is_active)
+        ).all()

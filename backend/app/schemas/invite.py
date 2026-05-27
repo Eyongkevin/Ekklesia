@@ -16,8 +16,8 @@ class Invite(InviteBase):
     code: str
     church_id: uuid.UUID
     is_active: bool
-    created_at: str
-    modified_at: str
+    created_at: datetime
+    modified_at: datetime
 
 class InviteRes(BaseModel):
     code: str

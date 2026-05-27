@@ -23,3 +23,10 @@ def create_invite(invite: invite_schemas.InviteCreate, user: User = Depends(deps
         "code": invite_code.code,
         "link": f"https://t.me/{settings.TELEGRAM_BOT_USERNAME}?start={invite_code.code}"
     }
+
+@router.get("/", response_model=list[invite_schemas.Invite])
+def get_invites(is_active: bool = True, user: User = Depends(deps.get_user), uow: UnitOfWork = Depends(deps.get_db)):
+    return invite_services.InviteService(uow).get_invites(
+        church_id=user.memberships[0].church_id,
+        is_active=is_active
+    )
