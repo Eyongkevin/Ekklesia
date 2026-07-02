@@ -28,6 +28,7 @@ class ChurchCreate(ChurchBase):
 
 class Church(ChurchBase):
     id: uuid.UUID
+    code: str
     themes: list[Theme]
 
 # Church Contact

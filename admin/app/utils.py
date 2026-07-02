@@ -46,3 +46,9 @@ def format_datetime(dt: datetime) -> str:
     if dt is None:
         return "N/A"
     return dt.strftime("%A, %d %B %Y at %I:%M %p")
+
+def get_expire_at(expire_date: str, expire_time: str):
+    return datetime.strptime(
+        f"{expire_date} {expire_time}", 
+        "%Y-%m-%d %H:%M"
+    )

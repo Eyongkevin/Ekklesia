@@ -12,11 +12,20 @@ def get_db():
         yield uow
 
 def get_user(request: Request, uow: UnitOfWork = Depends(get_db)) -> User:
-    token = request.cookies.get('access_token')
+    auth_header = request.headers.get('Authorization')
 
-    if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    if not auth_header:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing Authorization header"
+        )
     try:
+        scheme, token = auth_header.split()
+        if scheme.lower() != "bearer":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication scheme"
+            )
         payload = jwt.decode(
             token,
             settings.SECRET_KEY,

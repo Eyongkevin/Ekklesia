@@ -23,7 +23,7 @@ class User(UserBase):
 
     model_config = ConfigDict(from_attributes=True)
 
-class UserAnnouncement(BaseModel):
+class UserFirstName(BaseModel):
     first_name: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -34,3 +34,4 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     message: str
     user: User
+    access_token: str
