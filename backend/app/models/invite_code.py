@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.sql import func
@@ -25,6 +25,11 @@ class InviteCode(Base):
         ForeignKey("churches.id")
     )
 
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id")
+    )
+
     is_active: Mapped[bool] = mapped_column(default=True)
 
     expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
@@ -36,6 +41,12 @@ class InviteCode(Base):
     modified_at: Mapped[datetime] = mapped_column(
         server_default=func.now(),
         onupdate=func.now()
+    )
+
+    creator: Mapped["User"] = relationship(
+        "User",
+        foreign_keys=[user_id],
+        viewonly=True,
     )
 
     def __repr__(self) -> str:

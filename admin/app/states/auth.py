@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Optional
 from datetime import date
 
 import reflex as rx
@@ -15,6 +15,7 @@ from app.states.church import ChurchState
 class AuthState(rx.State):
     user: dict = {}
     is_authenticated: bool = False
+    access_token: Optional[str] = None
     error: str = ""
 
     @rx.event
@@ -36,9 +37,10 @@ class AuthState(rx.State):
         membership_state: MembershipState = await self.get_state(MembershipState)
         membership_state.set_stats(church_state.church.get('id'))
 
-    def set_auth(self, user: dict):
+    def set_auth(self, user: dict, token: str):
         self.user = user
         self.is_authenticated = True
+        self.access_token = token
 
     @rx.event
     def logout(self):
@@ -63,7 +65,7 @@ class LoginState(AuthState):
     async def login(self) -> None:
         try:
             success = await auth_service.login(self.email, self.password)
-            self.set_auth(success['user'])
+            self.set_auth(success['user'], success['access_token'])
 
             return rx.redirect('/dashboard')
 

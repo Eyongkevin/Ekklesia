@@ -10,6 +10,7 @@ from app.states.status import StatusState
 from app.states.audience import AudienceState
 from app.pages.components.form_label import form_label
 from app.pages.components.view_announcement import announcement_view_modal
+from app.pages.components.pagination_control import pagination_controls
 from app.utils import get_short_desc
 
 
@@ -737,33 +738,11 @@ def announcement_table():
         bg="white",
     )
 
-def pagination_controls():
-    return rx.hstack(
-        rx.button(
-            "Previous",
-            on_click=AnnouncementListState.prev_page,
-            disabled=AnnouncementListState.page == 1,
-        ),
-
-        rx.text(
-            f"Page {AnnouncementListState.page} of {AnnouncementListState.total_pages}"
-        ),
-
-        rx.button(
-            "Next",
-            on_click=AnnouncementListState.next_page,
-            disabled=AnnouncementListState.page == AnnouncementListState.total_pages,
-        ),
-
-        justify="end",
-        width="100%",
-        padding_top="1em",
-    )
 
 def announcement_list():
     return rx.vstack(
         announcement_table(),
-        pagination_controls(),
+        pagination_controls(AnnouncementListState),
         width="100%",
         spacing="4",
     )
