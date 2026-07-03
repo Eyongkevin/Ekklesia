@@ -6,7 +6,6 @@ from pydantic import BaseModel, ConfigDict, HttpUrl, computed_field
 from app.schemas.user import UserFirstName
 from app.core.utils import format_expire_in
 
-from app.core.config import settings
 
 class InviteBase(BaseModel):
     # TODO: Move 'code' to base and add verification
