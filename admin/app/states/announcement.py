@@ -398,6 +398,10 @@ class AnnouncementListState(rx.State):
 
         announcement_service.delete(auth_state.access_token, self.announcement_to_be_deleted['id'])
         self.show_view_modal = False
+        try:
+            del self.selected_ids[self.announcement_to_be_deleted['id']]
+        except KeyError:
+            pass
         self.announcement_to_be_deleted = None
         self.show_deletion_modal = False
 
