@@ -9,7 +9,7 @@ from app.states.announcement import (
 from app.states.status import StatusState
 from app.states.audience import AudienceState
 from app.pages.components.form_label import form_label
-from app.pages.components.view_announcement import announcement_view_modal
+from app.pages.components.view_announcement import announcement_view_modal, announcement_delete_modal
 from app.pages.components.pagination_control import pagination_controls
 from app.utils import get_short_desc
 
@@ -22,7 +22,18 @@ def church_announcement_card():
                 width="100%",
                 padding="1em",
             ),
-            announcement_filters(),
+            rx.hstack(
+                rx.fragment(
+                    announcement_actions(),
+                    announcement_delete_modal()
+                ),
+                rx.spacer(),
+                announcement_filters(),
+                bg="white",
+                padding="20px",
+                border_radius="12px",
+                box_shadow="sm",
+            ),
             rx.flex(
                 announcement_list(),
                 padding="1em",
@@ -520,21 +531,28 @@ def announcement_filters():
             ),
 
             justify="between",
-            width="70%",
+            width="100%",
             wrap="wrap",
             spacing="4",
         ),
-
-        bg="white",
-        padding="20px",
-        border_radius="12px",
-        box_shadow="sm",
     )
+
+def announcement_actions():
+    return rx.select(
+        ["Delete selected items"],
+        value=AnnouncementListState.actions_value,
+        on_change=AnnouncementListState.on_select_actions,
+        color_scheme="red",
+        placeholder="Actions",
+    )
+
+
 
 def announcement_table_header():
     return rx.hstack(
         rx.checkbox(
-            on_change=lambda _: AnnouncementListState.select_all()
+            checked=AnnouncementListState.toggle_all_was_selected,
+            on_change=lambda _: AnnouncementListState.toggle_select_all()
         ),
         rx.text("Announcement", font_weight="bold", width="40%"),
         rx.text("Status", font_weight="bold", width="10%"),
@@ -569,7 +587,7 @@ def announcement_actions_menu(announcement):
             rx.menu.separator(),
             rx.menu.item(
                 "Delete",
-                on_click=lambda: AnnouncementListState.delete_announcement(announcement["id"]),
+                on_click=lambda: AnnouncementListState.open_delete_modal(announcement),
                 color="red",
             ),
         ),
@@ -625,7 +643,7 @@ def announcement_row(announcement):
         # ✅ Checkbox
         rx.checkbox(
             checked=AnnouncementListState.selected_ids.contains(announcement["id"]),
-            on_change=lambda _: AnnouncementListState.toggle_select(announcement["id"]),
+            on_change=lambda _: AnnouncementListState.toggle_select(announcement["id"], announcement['title']),
         ),
 
         # 📄 Announcement (title + description)

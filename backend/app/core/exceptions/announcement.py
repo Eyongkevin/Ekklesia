@@ -11,3 +11,13 @@ class AnnouncementNotFound(AppException):
     def __init__(self, detail: str | None = None):
         if detail:
             self.detail = detail
+
+class AnnouncementDeletionFailed(AppException):
+    """Announcement deletion failed exception"""
+
+    status_code = 404
+    detail = "Announcement not found"
+
+    def __init__(self, detail: str | None = None):
+        if detail:
+            self.detail = detail

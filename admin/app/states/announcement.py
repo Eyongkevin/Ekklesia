@@ -7,7 +7,7 @@ from app.states.status import StatusState
 from app.states.church import ChurchState
 
 class AnnouncementType(TypedDict):
-    id: int
+    id: str
     title: str
     content: str
     status: dict[str, str | bool]
@@ -133,7 +133,6 @@ class AnnouncementState(rx.State):
         self.show_add_update_drawer = False
         form_state = await self.get_state(AnnouncementFormState)
         form_state.reset_form()
-
 
 class AnnouncementFormState(rx.State):
     id: str = ""
@@ -344,18 +343,32 @@ class AnnouncementFilterState(rx.State):
         self.end_date = value
 
 class AnnouncementListState(rx.State):
-    announcements: list[AnnouncementType] = []  # fetched from backend
+    announcements: list[AnnouncementType] = []
 
     page: int = 1
     per_page: int = 10
     total_pages: int = 1
 
-    selected_ids: set[int] = set()
+    selected_ids: dict[str, str] = dict()
+    announcement_to_be_deleted: Optional[AnnouncementType] = None
 
     open_menu_id: int | None = None
 
     show_view_modal: bool = False
     selected_announcement: Optional[AnnouncementType] = None
+    actions_value: str = ""
+    show_deletion_modal: bool = False
+
+    @rx.event
+    def on_select_actions(self, action: str):
+        if action == "Delete selected items" and self.selected_ids:
+            # TODO: Open a modal showing items to be deleted and comfirmation
+            self.show_deletion_modal = True
+        self.actions_value = ""
+
+    @rx.var
+    def toggle_all_was_selected(self) -> bool:
+        return len(self.announcements) == len(self.selected_ids)
 
     @rx.event
     def open_view_modal(self, announcement: AnnouncementType):
@@ -368,10 +381,43 @@ class AnnouncementListState(rx.State):
         self.show_view_modal = False
 
     @rx.event
-    async def delete_announcement(self, announcement_id: str):
-        announcement_service.delete(announcement_id)
+    def open_delete_modal(self, announcement: AnnouncementType | None = None):
+        if announcement is not None:
+            self.announcement_to_be_deleted = announcement
+            self.show_view_modal = False
+        self.show_deletion_modal = True
+
+    @rx.event
+    def close_delete_modal(self):
+        self.announcement_to_be_deleted = None
+        self.show_deletion_modal = False
+
+    @rx.event
+    async def delete_announcement(self):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+
+        announcement_service.delete(auth_state.access_token, self.announcement_to_be_deleted['id'])
         self.show_view_modal = False
+        self.announcement_to_be_deleted = None
+        self.show_deletion_modal = False
+
         yield rx.toast.success("Announcement deleted")
+
+        await self.paginated_announcements()
+
+    @rx.event
+    async def delete_many_announcement(self):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+
+        announcement_service.delete_many(auth_state.access_token, list(self.selected_ids))
+        self.show_deletion_modal = False
+        self.selected_ids = dict()
+        self.show_deletion_modal = False
+        yield rx.toast.success("Announcements deleted")
 
         await self.paginated_announcements()
 
@@ -397,7 +443,6 @@ class AnnouncementListState(rx.State):
         self.show_view_modal = False
         announcement_state.show_add_update_drawer = True
 
-
     def toggle_menu(self, announcement_id: int):
         if self.open_menu_id == announcement_id:
             self.open_menu_id = None
@@ -414,18 +459,28 @@ class AnnouncementListState(rx.State):
             self.page -= 1
             await self.paginated_announcements()
 
-    def toggle_select(self, announcement_id: int):
+    def toggle_select(self, announcement_id: str, announcement_title: str):
         if announcement_id in self.selected_ids:
-            self.selected_ids.remove(announcement_id)
+            del self.selected_ids[announcement_id]
         else:
-            self.selected_ids.add(announcement_id)
+            self.selected_ids[announcement_id] = announcement_title
 
-    def select_all(self):
-        current_ids = [a["id"] for a in self.announcements]
-        self.selected_ids = set(current_ids)
+    def toggle_select_all(self):
+        current_ids = {a["id"]: a["title"] for a in self.announcements}
+        if len(current_ids) == len(self.selected_ids):
+            self.clear_selection()
+        else:
+            self.select_all(current_ids)
+
+    def select_all(self, current_ids: dict[str, str]):
+        self.selected_ids = current_ids
 
     def clear_selection(self):
-        self.selected_ids = set()
+        self.selected_ids = dict()
+
+    @rx.var
+    def selected_id_values(self) -> list[str]:
+        return list(self.selected_ids.values())
 
     async def paginated_announcements(self)-> None:
         # start = (self.page - 1) * self.per_page

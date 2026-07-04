@@ -380,14 +380,9 @@ def announcement_view_modal():
                         rx.button(
                             rx.icon("trash-2", size=16),
                             rx.text("Delete"),
-
                             color_scheme="red",
                             variant="soft",
-
-                            on_click=lambda: AnnouncementListState.delete_announcement(
-                                announcement["id"]
-                            ),
-
+                            on_click=lambda: AnnouncementListState.open_delete_modal(announcement),
                             spacing="2",
                         ),
                         # UPDATE
@@ -451,4 +446,64 @@ def announcement_view_modal():
             padding="24px",
         ),
         open=AnnouncementListState.show_view_modal,
+    )
+
+def announcement_delete_modal():
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.icon("triangle-alert", size=30, color="red"),
+                rx.heading("Please Confirm", size="4"),
+                rx.dialog.description(
+                    "The following announcements would be deleted."
+                ),
+                align="center"
+            ),
+            rx.inset(
+                rx.list.unordered(
+                    rx.cond(
+                        AnnouncementListState.announcement_to_be_deleted,
+                        rx.list.item(
+                            AnnouncementListState.announcement_to_be_deleted['title'],
+                            font_size="12px",
+                            padding="2px 4px",
+                            width="100%",
+                        ),
+                        rx.foreach(
+                            AnnouncementListState.selected_id_values,
+                            lambda selected_title: rx.list.item(
+                                selected_title,
+                                font_size="12px",
+                                padding="2px 4px",
+                                width="100%",
+                            ),
+                        ),
+
+                    ),
+                    
+                ),
+                side="x",
+                margin_top="24px",
+                margin_bottom="24px",
+            ),
+            rx.flex(
+                rx.dialog.close(
+                    rx.button("Delete", color_scheme="red", on_click=rx.cond(
+                        AnnouncementListState.announcement_to_be_deleted,
+                        AnnouncementListState.delete_announcement,
+                        AnnouncementListState.delete_many_announcement
+                        )
+                    )
+                ),
+                rx.dialog.close(
+                    rx.button("Cancel", variant="soft", color_scheme="gray", on_click=AnnouncementListState.close_delete_modal),
+                ),
+                spacing="3",
+                justify="end",
+            ),
+            max_width="450px",
+            width="95vw",
+            padding="24px",
+        ),
+        open=AnnouncementListState.show_deletion_modal,
     )

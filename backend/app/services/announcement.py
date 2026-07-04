@@ -86,6 +86,14 @@ class AnnouncementService:
         self.announcement_crud.delete(announcement)
 
         self.uow.commit()
+
+    def delete_many(self, announcement_ids: list[str]) -> int:
+        deleted_ids =  self.announcement_crud.delete_many(announcement_ids)
+        if deleted_ids == 0:
+            raise announcement_exceptions.AnnouncementDeletionFailed("No announcements were found to delete.")
+        
+        self.uow.commit()
+        return deleted_ids
     
     def get_announcements(
             self,
