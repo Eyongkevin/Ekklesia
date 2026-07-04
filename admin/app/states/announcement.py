@@ -120,29 +120,27 @@ class AnnouncementState(rx.State):
 
     @rx.event
     async def open_add_update_drawer(self):
-        status_state = await self.get_state(StatusState)
         announcement_form_state = await self.get_state(AnnouncementFormState)
         #? We want the default to be 'Published'. So, here it needs to be the second status
-        announcement_form_state.status = status_state.get_status_names[1]
-        announcement_form_state.publish_date = str(date.today())
+        announcement_form_state.reset_form()
 
         self.show_add_update_drawer = True
 
     @rx.event
     async def close_add_update_drawer(self):
         self.show_add_update_drawer = False
-        form_state = await self.get_state(AnnouncementFormState)
-        form_state.reset_form()
+        announcement_form_state = await self.get_state(AnnouncementFormState)
+        announcement_form_state.reset_form()
 
 class AnnouncementFormState(rx.State):
     id: str = ""
     title: str = ""
     max_title_len: int = 100
-    status: str = "Draft"
+    status: str = "Published"
     pin_to_top: bool = True
     tags: list[str] = []
     audiences: list[str] = []
-    publish_date: Optional[str] = None
+    publish_date: Optional[str] = str(date.today())
     expire_date: Optional[str] = None
     content: str = ""
 
