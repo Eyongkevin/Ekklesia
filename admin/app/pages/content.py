@@ -1,7 +1,7 @@
 import reflex as rx
 
 from app.states.dashboard import DashboardState
-from app.pages.contents import profile, announcement
+from app.pages.contents import profile, announcement, invite
 
 def dashboard_content():
     return rx.box(
@@ -13,6 +13,7 @@ def dashboard_content():
             ("devotion", rx.text("Daily Devotion Page")),
             ("projects", rx.text("Projects Page")),
             ("qa", rx.text("Q&A Page")),
+            ("invites", invite.invite_codes_content()),
             ("prayer", rx.text("Prayer Requests")),
             ("marriage", rx.text("Marriage Requests")),
             ("testimony", rx.text("Testimonies")),

@@ -6,6 +6,7 @@ from app.services.membership import MembershipService
 from app.core.utils import MembershipRole
 from app.schemas import user as user_schemas
 from app.core.security import create_access_token
+from app.core.config import settings
 from app.db.uow import UnitOfWork
 
 
@@ -38,12 +39,14 @@ async def login_user(payload: user_schemas.LoginRequest, response: Response, uow
         key="access_token",
         value=token,
         httponly=True,
-        samesite="lax"
+        samesite="lax",
+        secure=settings.SECURE
     )
 
     return {
         "message": "Login successful",
-        "user": user
+        "user": user,
+        "access_token": token
     }
 
 

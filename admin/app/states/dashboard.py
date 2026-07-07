@@ -3,6 +3,8 @@ import reflex as rx
 from app.states.announcement import AnnouncementListState, AnnouncementTagState
 from app.states.status import StatusState
 from app.states.audience import AudienceState
+from app.states.church import ChurchState
+from app.states.invite import InviteFormState, InvitetListState
 
 class DashboardState(rx.State):
     current_page: str = 'church'
@@ -23,6 +25,15 @@ class DashboardState(rx.State):
 
             announcement_list_state = await self.get_state(AnnouncementListState)
             await announcement_list_state.paginated_announcements()
+
+        if page == 'invites':
+            church_state = await self.get_state(ChurchState)
+
+            invite_form_state = await self.get_state(InviteFormState)
+            invite_form_state.church_code = church_state.church['code']
+
+            invite_list_state = await self.get_state(InvitetListState)
+            await invite_list_state.paginated_invites()
         self.current_page = page
 
     @rx.var
