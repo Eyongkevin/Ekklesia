@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str
     TELEGRAM_BOT_USERNAME: str
     SECRET_KEY: str
+    ALGORITHM: str
 
     class Config:
         env_file = ".env"

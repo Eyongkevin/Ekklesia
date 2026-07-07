@@ -20,6 +20,9 @@ class ChurchService:
     def get_churches(self) -> list[schema_church.Church]:
         return self.church_crud.get_churches()
     
+    def get_church_code(self, church_id: str) -> str | None:
+        return self.church_crud.get_church_code(church_id)
+    
     def get_church_by_user_id(self, user_id: str) -> schema_church.Church | None:
         membership = MembershipService(self.uow).user_church_membership(user_id)
         if membership:
