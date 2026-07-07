@@ -20,7 +20,7 @@ class InviteCRUD:
             )
     ).first()
 
-    def create_invite_code(self, code: str, church_id: str, expires_at: Optional[datetime] = None):
+    def create_invite_code(self, code: str, church_id: str, expires_at: Optional[datetime] = None) -> InviteCode:
         invite = InviteCode(
             code=code,
             church_id=church_id,
@@ -28,7 +28,5 @@ class InviteCRUD:
         )
 
         self.db.add(invite)
-        self.db.commit()
-        self.db.refresh(invite)
 
         return invite

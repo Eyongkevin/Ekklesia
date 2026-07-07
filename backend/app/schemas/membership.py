@@ -2,7 +2,7 @@ import uuid
 
 from pydantic import BaseModel, ConfigDict
 
-from app.core.schemas.church import Church
+from app.schemas.church import Church
 
 
 class MembershipBase(BaseModel):

@@ -1,7 +1,7 @@
 from typing import Optional
 import uuid
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, HttpUrl
 
 class InviteBase(BaseModel):
     expires_at: Optional[datetime] = None
@@ -18,3 +18,7 @@ class Invite(InviteBase):
     is_active: bool
     created_at: str
     modified_at: str
+
+class InviteRes(BaseModel):
+    code: str
+    link: HttpUrl

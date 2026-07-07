@@ -4,7 +4,7 @@ from starlette.responses import RedirectResponse
 
 from app.services.user import UserService
 from app.services.membership import MembershipService
-from app.core.schemas import user as user_schemas
+from app.schemas import user as user_schemas
 from app.db.uow import UnitOfWork
 
 class AdminAuth(AuthenticationBackend):
