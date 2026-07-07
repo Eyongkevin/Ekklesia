@@ -59,8 +59,21 @@ def submit(
 
     return response.json()
 
-def delete(announcement_id: str) -> None:
-    response = httpx.delete(f"{settings.BASE_URL}/announcements/{announcement_id}/")
+def delete(access_token: str, announcement_id: str) -> None:
+    response = httpx.delete(f"{settings.BASE_URL}/announcements/{announcement_id}/", headers={
+                "Authorization": f"Bearer {access_token}"
+            })
+    response.raise_for_status()
+
+def delete_many(access_token: str, announcement_ids: list[str]) -> None:
+    response = httpx.request(
+        "DELETE",
+        f"{settings.BASE_URL}/announcements/",
+        json=announcement_ids,
+        headers={
+                "Authorization": f"Bearer {access_token}"
+            }
+    )
     response.raise_for_status()
 
 def get_announcements(

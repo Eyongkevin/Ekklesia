@@ -48,6 +48,13 @@ class AnnouncementCRUD:
     
     def delete(self, announcement: Announcement) -> None:
         self.db.delete(announcement)
+
+    def delete_many(self, announcement_ids: list[str]) -> int:
+        return (
+            self.db.query(Announcement)
+            .filter(Announcement.id.in_(announcement_ids))
+            .delete(synchronize_session=False)
+        )
     
     def get_announcements(self, 
                     church_id: str,
