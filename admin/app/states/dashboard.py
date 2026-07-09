@@ -15,13 +15,13 @@ class DashboardState(rx.State):
     async def set_page(self, page: str) -> None:
         if page == 'announcements':
             tag_state = await self.get_state(AnnouncementTagState)
-            tag_state.get_tags()
+            await tag_state.get_tags()
 
             status_state = await self.get_state(StatusState)
-            status_state.get_active_status()
+            await status_state.get_active_status()
 
             audience_state = await self.get_state(AudienceState)
-            audience_state.get_active_audiences()
+            await audience_state.get_active_audiences()
 
             announcement_list_state = await self.get_state(AnnouncementListState)
             await announcement_list_state.paginated_announcements()

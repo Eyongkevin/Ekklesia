@@ -9,8 +9,11 @@ class ThemeState(rx.State):
     theme: str
     verse: str
 
-    def set_church_theme(self, church_id: str, year: int):
-        theme: dict[str, str] | None = church_service.get_church_them_by_year(church_id, year)
+    async def set_church_theme(self, church_id: str, year: int):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+        theme: dict[str, str] | None = church_service.get_church_them_by_year(auth_state.access_token, church_id, year)
         if theme:
             for key, value in theme.items():
                 if hasattr(self, key) and value:
@@ -32,7 +35,7 @@ class ThemeFormState(rx.State):
     async def open_modal(self):
         church_state = await self.get_state(ChurchState)
         church_id: str = church_state.church.get('id', '')
-        self.set_church_theme(church_id, date.today().year)
+        await self.set_church_theme(church_id, date.today().year)
 
         self.is_open = True
 
@@ -42,10 +45,14 @@ class ThemeFormState(rx.State):
 
     @rx.event
     async def save_theme(self):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
         church_state = await self.get_state(ChurchState)
         church_id: str = church_state.church.get('id', '')
 
         theme = church_service.create_or_update_church_theme(
+            auth_state.access_token,
             church_id,
             self.year,
             self.theme,
@@ -55,11 +62,16 @@ class ThemeFormState(rx.State):
             theme_state: ThemeState = await self.get_state(ThemeState)
             theme_state.set_church_theme(church_id, self.year)
             self.reset()
+            yield rx.toast.success("Theme saved")
         else: 
             self.error = "Theme not saved. An error occured!!"
+            yield rx.toast.error("Theme not saved. An error occured!!")
 
-    def set_church_theme(self, church_id: str, year: int):
-        theme: dict[str, str] | None = church_service.get_church_them_by_year(church_id, year)
+    async def set_church_theme(self, church_id: str, year: int):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+        theme: dict[str, str] | None = church_service.get_church_them_by_year(auth_state.access_token, church_id, year)
         if theme:
             for key, value in theme.items():
                 if hasattr(self, key) and value:

@@ -9,15 +9,13 @@ from app.models import User
 
 router = APIRouter(prefix="/announcements", tags=["announcements"])
 
-@router.post("/", response_model=announcement_schemas.Announcement)
-def create(announcement: announcement_schemas.AnnouncementCreate, uow: UnitOfWork = Depends(deps.get_db)):
-    return announcement_services.AnnouncementService(uow).create(announcement)
+@router.post("/", response_model=announcement_schemas.Announcement, status_code=http_status.HTTP_201_CREATED)
+def create(announcement: announcement_schemas.AnnouncementCreate, user: User = Depends(deps.get_user),  uow: UnitOfWork = Depends(deps.get_db)):
+    return announcement_services.AnnouncementService(uow).create(user.id, announcement)
 
-
-@router.put("/{announcement_id}/", response_model=announcement_schemas.Announcement)
-def update(announcement_id: str, announcement: announcement_schemas.AnnouncementUpdate, uow: UnitOfWork = Depends(deps.get_db)):
+@router.put("/{announcement_id}/", response_model=announcement_schemas.Announcement, status_code=http_status.HTTP_200_OK)
+def update(announcement_id: str, announcement: announcement_schemas.AnnouncementUpdate, _: User = Depends(deps.get_user), uow: UnitOfWork = Depends(deps.get_db)):
     return announcement_services.AnnouncementService(uow).update(announcement_id, announcement)
-
 
 @router.delete("/{announcement_id}/", status_code=http_status.HTTP_204_NO_CONTENT)
 def delete(announcement_id: str,  _: User = Depends(deps.get_user), uow: UnitOfWork = Depends(deps.get_db)) -> None:
@@ -27,15 +25,15 @@ def delete(announcement_id: str,  _: User = Depends(deps.get_user), uow: UnitOfW
 def delete_many(announcement_ids: list[str],  _: User = Depends(deps.get_user), uow: UnitOfWork = Depends(deps.get_db)):
     announcement_services.AnnouncementService(uow).delete_many(announcement_ids)
 
-@router.get("/", response_model=announcement_schemas.AnnouncementListRes)
+@router.get("/", response_model=announcement_schemas.AnnouncementListRes, status_code=http_status.HTTP_200_OK)
 def get_announcements(
     church_id: str,
     filters: announcement_schemas.AnnouncementFilterOptions = Depends(),
-    uow: UnitOfWork = Depends(deps.get_db)):
+    uow: UnitOfWork = Depends(deps.get_db),
+    _: User = Depends(deps.get_user)):
         return announcement_services.AnnouncementService(uow).get_announcements(church_id, filters)
 
-
 # TAGS
-@router.get("/tags/", response_model=list[announcement_schemas.AnnouncementTag])
-def tags( uow: UnitOfWork = Depends(deps.get_db)):
+@router.get("/tags/", response_model=list[announcement_schemas.AnnouncementTag], status_code=http_status.HTTP_200_OK)
+def tags(_: User = Depends(deps.get_user), uow: UnitOfWork = Depends(deps.get_db)):
     return announcement_services.AnnouncementTagService(uow).get_tags()

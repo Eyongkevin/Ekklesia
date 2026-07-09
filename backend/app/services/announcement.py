@@ -1,3 +1,5 @@
+import uuid
+
 from app.repositories.announcement import AnnouncementCRUD, AnnouncementTagCRUD
 from app.db.uow import UnitOfWork
 from app.schemas import announcement as announcement_schemas
@@ -13,7 +15,7 @@ class AnnouncementService:
         self.uow = uow
         self.announcement_crud = AnnouncementCRUD(self.uow.db)
 
-    def create(self, data: announcement_schemas.AnnouncementCreate) -> Announcement:
+    def create(self, user_id: uuid.UUID,  data: announcement_schemas.AnnouncementCreate) -> Announcement:
         # extract tags
         tags = AnnouncementTagService(self.uow).get_tags_by_names(data.tags)
         # extract audience
@@ -27,6 +29,7 @@ class AnnouncementService:
 
         announcement = self.announcement_crud.create(
             **dict_data,
+            created_by=user_id,
             tags=tags,
             audiences=audiences,
             status_id=status.id

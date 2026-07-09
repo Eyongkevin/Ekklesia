@@ -7,8 +7,11 @@ class AudienceState(rx.State):
     description: str
     audiences: list[dict[str, str]]
 
-    def get_active_audiences(self):
-        self.audiences = audience_service.get_active_audience()
+    async def get_active_audiences(self):
+        from app.states.auth import AuthState
+
+        auth_state: AuthState = await self.get_state(AuthState)
+        self.audiences = audience_service.get_active_audience(auth_state.access_token)
 
     @rx.var
     def get_audience_name(self) -> list[str]:

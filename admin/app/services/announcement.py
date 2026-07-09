@@ -5,19 +5,21 @@ import httpx
 from app.config import settings
 
 
-def get_tags():
-    response = httpx.get(f"{settings.BASE_URL}/announcements/tags/")
+def get_tags(access_token: str):
+    response = httpx.get(f"{settings.BASE_URL}/announcements/tags/", headers={
+            "Authorization": f"Bearer {access_token}"
+    })
     response.raise_for_status()
     return response.json()
 
 def submit(
+    access_token: str,
     id: Optional[str],
     title: str,
     content: str,
     is_pinned: bool,
     links: list[dict[str, str]],
     status: str,
-    created_by: str,
     church_id: str,
     publish_at: Optional[str] = None,
     expire_at: Optional[str] = None,
@@ -33,13 +35,12 @@ def submit(
             "is_pinned": is_pinned,
             "status": status,
             "links": links,
-            "created_by": created_by,
             "church_id": church_id,
             "publish_at": publish_at,
             "expire_at": expire_at,
             "tags": tags,
             "audiences": audiences
-        })
+        }, headers={"Authorization": f"Bearer {access_token}"})
     else:
         # Create new announcement
         response = httpx.post(f"{settings.BASE_URL}/announcements/", json={
@@ -48,13 +49,12 @@ def submit(
             "is_pinned": is_pinned,
             "status": status,
             "links": links,
-            "created_by": created_by,
             "church_id": church_id,
             "publish_at": publish_at,
             "expire_at": expire_at,
             "tags": tags,
             "audiences": audiences
-        })
+        }, headers={"Authorization": f"Bearer {access_token}"})
         response.raise_for_status()
 
     return response.json()
@@ -77,6 +77,7 @@ def delete_many(access_token: str, announcement_ids: list[str]) -> None:
     response.raise_for_status()
 
 def get_announcements(
+    access_token: str,
     church_id: str,
     status: str,
     audience: str,
@@ -96,6 +97,8 @@ def get_announcements(
         "page": page,
         "per_page": per_page
     }
-    response = httpx.get(f"{settings.BASE_URL}/announcements/", params=params)
+    response = httpx.get(f"{settings.BASE_URL}/announcements/", params=params, headers={
+                "Authorization": f"Bearer {access_token}"
+            })
     response.raise_for_status()
     return response.json()

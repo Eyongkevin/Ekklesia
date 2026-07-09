@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api.deps import get_db
 from app.services.user import UserService
@@ -24,31 +25,29 @@ def register_user(payload: user_schemas.InviteUserCreate, uow: UnitOfWork = Depe
 
 
 @router.post("/login/", response_model=user_schemas.LoginResponse)
-async def login_user(payload: user_schemas.LoginRequest, response: Response, uow: UnitOfWork = Depends(get_db)):
+async def login_user(response: Response, payload:OAuth2PasswordRequestForm = Depends(),  uow: UnitOfWork = Depends(get_db)):
     user=UserService(uow).authenticate_user(
-        email=payload.email,
+        email=payload.username,
         password=payload.password
     )
 
     if user is None or not MembershipService(uow).check_is_church_admin(str(user.id)):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     
-    token: str = create_access_token(str(user.id), MembershipRole.CHURCH_ADMIN)
+    access_token: str = create_access_token(str(user.id), MembershipRole.CHURCH_ADMIN)
 
     response.set_cookie(
         key="access_token",
-        value=token,
+        value=access_token,
         httponly=True,
         samesite="lax",
         secure=settings.SECURE
     )
 
     return {
-        "message": "Login successful",
-        "user": user,
-        "access_token": token
+        "access_token": access_token,
+        "token_type": "bearer"
     }
-
 
 @router.get('/memberships/{church_id}/stats')
 def membership_stats(church_id: str, uow: UnitOfWork = Depends(get_db)) -> dict[str, dict[str, int]]:

@@ -22,98 +22,98 @@ class AnnouncementType(TypedDict):
     created_at: str
     modified_at: str
 
-sample_announcements: list[AnnouncementType] = [
-    {
-        "id": 1,
-        "title": "Baptism Service - May Edition",
-        "content": "Join us this Sunday for the baptism of new members after the main service.",
-        "status": "Published",
-        "published_at": "2026-05-01 18:00",
-        "tags": ['Prayer', 'Event', 'Conference'],
-        "audience": ['Men'], 
-    },
-    {
-        "id": 2,
-        "title": "Youth Conference 2026",
-        "content": "A powerful gathering for young people with guest speakers and worship sessions.",
-        "status": "Scheduled",
-        "published_at": "2026-05-10 10:00",
-        "tags": ["Conference"],
-        "audience": ["Youth"],
-    },
-    {
-        "id": 3,
-        "title": "Weekly Prayer Meeting",
-        "content": "Join us every Wednesday evening for a time of prayer and intercession.",
-        "status": "Published",
-        "published_at": "2026-04-28 17:30",
-        "tags": ['Prayer', 'General', 'Urgent'],
-        "audience": ['All Members'],
-    },
-    {
-        "id": 4,
-        "title": "Church Cleanup Exercise",
-        "content": "Volunteers are needed this Saturday to help clean and organize the church premises.",
-        "status": "Draft",
-        "published_at": "",
-        "tags": ["Baptism", "Urgent"],
-        "audience": ["Youth"],
-    },
-    {
-        "id": 5,
-        "title": "Marriage Seminar",
-        "content": "A seminar focused on building strong and lasting relationships.",
-        "status": "Expired",
-        "published_at": "2026-03-15 09:00",
-        "tags": ["Baptism", "Urgent"],
-        "audience": ["Members", "Leaders"],
-    },
-    {
-        "id": 6,
-        "title": "Choir Auditions",
-        "content": "Interested in joining the choir? Auditions will be held this Friday.",
-        "status": "Published",
-        "published_at": "2026-04-30 16:00",
-        "tags": [],
-        "audience": [],
-    },
-    {
-        "id": 7,
-        "title": "Leadership Training",
-        "content": "Training session for all department leaders and assistants.",
-        "status": "Scheduled",
-        "published_at": "2026-05-12 14:00",
-        "tags": [],
-        "audience": [],
-    },
-    {
-        "id": 8,
-        "title": "Easter Thanksgiving Service",
-        "content": "A special thanksgiving service celebrating the resurrection of Christ.",
-        "status": "Expired",
-        "published_at": "2026-04-05 08:00",
-        "tags": [],
-        "audience": [],
-    },
-    {
-        "id": 9,
-        "title": "New Members Orientation",
-        "content": "Orientation session to welcome and guide new members of the church.",
-        "status": "Published",
-        "published_at": "2026-05-02 11:00",
-        "tags": [],
-        "audience": [],
-    },
-    {
-        "id": 10,
-        "title": "Evangelism Outreach",
-        "content": "Join the outreach team as we spread the gospel in nearby communities.",
-        "status": "Draft",
-        "published_at": "",
-        "tags": [],
-        "audience": [],
-    },
-]
+# sample_announcements: list[AnnouncementType] = [
+#     {
+#         "id": 1,
+#         "title": "Baptism Service - May Edition",
+#         "content": "Join us this Sunday for the baptism of new members after the main service.",
+#         "status": "Published",
+#         "published_at": "2026-05-01 18:00",
+#         "tags": ['Prayer', 'Event', 'Conference'],
+#         "audience": ['Men'], 
+#     },
+#     {
+#         "id": 2,
+#         "title": "Youth Conference 2026",
+#         "content": "A powerful gathering for young people with guest speakers and worship sessions.",
+#         "status": "Scheduled",
+#         "published_at": "2026-05-10 10:00",
+#         "tags": ["Conference"],
+#         "audience": ["Youth"],
+#     },
+#     {
+#         "id": 3,
+#         "title": "Weekly Prayer Meeting",
+#         "content": "Join us every Wednesday evening for a time of prayer and intercession.",
+#         "status": "Published",
+#         "published_at": "2026-04-28 17:30",
+#         "tags": ['Prayer', 'General', 'Urgent'],
+#         "audience": ['All Members'],
+#     },
+#     {
+#         "id": 4,
+#         "title": "Church Cleanup Exercise",
+#         "content": "Volunteers are needed this Saturday to help clean and organize the church premises.",
+#         "status": "Draft",
+#         "published_at": "",
+#         "tags": ["Baptism", "Urgent"],
+#         "audience": ["Youth"],
+#     },
+#     {
+#         "id": 5,
+#         "title": "Marriage Seminar",
+#         "content": "A seminar focused on building strong and lasting relationships.",
+#         "status": "Expired",
+#         "published_at": "2026-03-15 09:00",
+#         "tags": ["Baptism", "Urgent"],
+#         "audience": ["Members", "Leaders"],
+#     },
+#     {
+#         "id": 6,
+#         "title": "Choir Auditions",
+#         "content": "Interested in joining the choir? Auditions will be held this Friday.",
+#         "status": "Published",
+#         "published_at": "2026-04-30 16:00",
+#         "tags": [],
+#         "audience": [],
+#     },
+#     {
+#         "id": 7,
+#         "title": "Leadership Training",
+#         "content": "Training session for all department leaders and assistants.",
+#         "status": "Scheduled",
+#         "published_at": "2026-05-12 14:00",
+#         "tags": [],
+#         "audience": [],
+#     },
+#     {
+#         "id": 8,
+#         "title": "Easter Thanksgiving Service",
+#         "content": "A special thanksgiving service celebrating the resurrection of Christ.",
+#         "status": "Expired",
+#         "published_at": "2026-04-05 08:00",
+#         "tags": [],
+#         "audience": [],
+#     },
+#     {
+#         "id": 9,
+#         "title": "New Members Orientation",
+#         "content": "Orientation session to welcome and guide new members of the church.",
+#         "status": "Published",
+#         "published_at": "2026-05-02 11:00",
+#         "tags": [],
+#         "audience": [],
+#     },
+#     {
+#         "id": 10,
+#         "title": "Evangelism Outreach",
+#         "content": "Join the outreach team as we spread the gospel in nearby communities.",
+#         "status": "Draft",
+#         "published_at": "",
+#         "tags": [],
+#         "audience": [],
+#     },
+# ]
 
 class AnnouncementState(rx.State):
     show_add_update_drawer: bool = False
@@ -159,7 +159,7 @@ class AnnouncementFormState(rx.State):
         from app.states.auth import AuthState
 
         auth_state: AuthState = await self.get_state(AuthState)
-        created_by = auth_state.user.get('id')
+        # created_by = auth_state.user.get('id')
 
         church_state: ChurchState = await self.get_state(ChurchState)
         church_id = church_state.church.get('id')
@@ -173,6 +173,7 @@ class AnnouncementFormState(rx.State):
     
         try:
             announcement_service.submit(
+                access_token= auth_state.access_token,
                 id=self.id,
                 title=self.title,
                 content=self.content,
@@ -183,7 +184,6 @@ class AnnouncementFormState(rx.State):
                 expire_at=self.expire_date if self.expire_date else None,
                 tags=self.tags,
                 audiences=self.audiences,
-                created_by=created_by,
                 church_id=church_id
             )
 
@@ -300,8 +300,11 @@ class AnnouncementTagState(rx.State):
     description: str
     tags: list[dict[str, str | bool]]
 
-    def get_tags(self):
-        self.tags = announcement_service.get_tags()
+    async def get_tags(self):
+        from app.states.auth import AuthState
+
+        auth_state: AuthState = await self.get_state(AuthState)
+        self.tags = announcement_service.get_tags(auth_state.access_token)
 
     @rx.var
     def get_tags_name(self) -> list[str]:
@@ -485,14 +488,16 @@ class AnnouncementListState(rx.State):
         return list(self.selected_ids.values())
 
     async def paginated_announcements(self)-> None:
-        # start = (self.page - 1) * self.per_page
-        # end = start + self.per_page
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
         church_state: ChurchState = await self.get_state(ChurchState)
         church_id = church_state.church.get('id')
 
         filter_state = await self.get_state(AnnouncementFilterState)
 
         announcements = announcement_service.get_announcements(
+            access_token=auth_state.access_token,
             church_id=church_id,
             status=filter_state.status,
             audience=filter_state.audience,

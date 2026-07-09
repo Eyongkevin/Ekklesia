@@ -49,7 +49,6 @@ class AnnouncementBase(BaseModel):
     title: str
     is_pinned: bool = False
     church_id: uuid.UUID
-    created_by: uuid.UUID
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -90,6 +89,7 @@ class Announcement(AnnouncementBase):
     audiences: list[AnnouncementAudience] = Field(default_factory=list)
     status: AnnouncementStatus
     creator: UserFirstName
+    created_by: uuid.UUID
     publish_at: Optional[date] = None
     expire_at: Optional[date] = None
     created_at: datetime
