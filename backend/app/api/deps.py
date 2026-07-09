@@ -1,4 +1,5 @@
 from fastapi import Request, HTTPException, status, Depends
+from fastapi.security import OAuth2PasswordBearer
 
 from jose import jwt, JWTError
 
@@ -7,25 +8,19 @@ from app.models import User
 from app.core.config import settings
 from app.services.user import UserService
 
+auth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/login/")
+
 def get_db():
     with UnitOfWork() as uow:
         yield uow
 
-def get_user(request: Request, uow: UnitOfWork = Depends(get_db)) -> User:
-    auth_header = request.headers.get('Authorization')
-
-    if not auth_header:
+def get_user(token: str = Depends(auth2_scheme), uow: UnitOfWork = Depends(get_db)) -> User:
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing Authorization header"
+            detail="Access token is missing."
         )
     try:
-        scheme, token = auth_header.split()
-        if scheme.lower() != "bearer":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authentication scheme"
-            )
         payload = jwt.decode(
             token,
             settings.SECRET_KEY,

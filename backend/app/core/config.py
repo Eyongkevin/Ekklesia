@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
     SECURE: bool = False
+    ACCESS_TOKEN_EXPIRE_HOURS: int
 
     class Config:
         env_file = ".env"

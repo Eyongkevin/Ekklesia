@@ -11,7 +11,7 @@ router = APIRouter(prefix="/invites", tags=["Invites"])
 
 
 
-@router.post("/", response_model=invite_schemas.Invite)
+@router.post("/", response_model=invite_schemas.Invite, status_code=http_status.HTTP_201_CREATED)
 def create_invite(invite: invite_schemas.InviteCreate, user: User = Depends(deps.get_user), uow: UnitOfWork = Depends(deps.get_db)):
     new_invite = invite_services.InviteService(uow).create_invite(
         church_id=user.memberships[0].church_id,
@@ -20,7 +20,7 @@ def create_invite(invite: invite_schemas.InviteCreate, user: User = Depends(deps
     )
     return new_invite
 
-@router.patch("/{invite_id}/", response_model=invite_schemas.Invite)
+@router.patch("/{invite_id}/", response_model=invite_schemas.Invite, status_code=http_status.HTTP_200_OK)
 def update_invite(invite_id: str, invite: invite_schemas.InviteUpdate,  _: User = Depends(deps.get_user), uow: UnitOfWork = Depends(deps.get_db)):
     return invite_services.InviteService(uow).update(invite_id, invite)
 
@@ -28,7 +28,7 @@ def update_invite(invite_id: str, invite: invite_schemas.InviteUpdate,  _: User 
 def delete_invite(invite_id: str, _: User = Depends(deps.get_user), uow: UnitOfWork = Depends(deps.get_db)):
     invite_services.InviteService(uow).delete(invite_id)
 
-@router.get("/", response_model=invite_schemas.InvitetListRes)
+@router.get("/", response_model=invite_schemas.InvitetListRes, status_code=http_status.HTTP_200_OK)
 def get_invites(
     filters: invite_schemas.InviteFilterOptions = Depends(),
     user: User = Depends(deps.get_user),

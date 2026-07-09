@@ -14,8 +14,11 @@ class ContactState(rx.State):
     instagram: str = ""
     website: str = ""
 
-    def set_church_contact(self, church_id: str):
-        contact: dict[str, str] | None = church_service.get_church_contact(church_id)
+    async def set_church_contact(self, church_id: str):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+        contact: dict[str, str] | None = church_service.get_church_contact(auth_state.access_token, church_id)
         if contact:
             for key, value in contact.items():
                 if hasattr(self, key) and value:
@@ -40,7 +43,7 @@ class ContactFormState(rx.State):
     async def open_modal(self):
         church_state = await self.get_state(ChurchState)
         church_id = church_state.church.get('id')
-        self.set_church_contact(church_id)
+        await self.set_church_contact(church_id)
 
         self.is_open = True
 
@@ -50,10 +53,14 @@ class ContactFormState(rx.State):
 
     @rx.event
     async def save_contact(self):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
         church_state = await self.get_state(ChurchState)
         church_id: str = church_state.church.get('id', '')
 
         contact = church_service.create_church_contact(
+            auth_state.access_token,
             church_id,
             self.country,
             self.city,
@@ -68,13 +75,18 @@ class ContactFormState(rx.State):
         )
         if contact:
             contact_state: ContactState = await self.get_state(ContactState)
-            contact_state.set_church_contact(church_id)
+            await contact_state.set_church_contact(church_id)
             self.reset()
-        else: 
+            yield rx.toast.success("Contact saved")
+        else:
             self.error = "Contact not saved. An error occured!!"
+            yield rx.toast.error("Contact not saved. An error occured!!")
 
-    def set_church_contact(self, church_id: str):
-        contact: dict[str, str] | None = church_service.get_church_contact(church_id)
+    async def set_church_contact(self, church_id: str):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+        contact: dict[str, str] | None = church_service.get_church_contact(auth_state.access_token, church_id)
         if contact:
             for key, value in contact.items():
                 if hasattr(self, key) and value:

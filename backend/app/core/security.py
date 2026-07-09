@@ -1,5 +1,5 @@
 from jose import jwt
-from datetime import datetime, timedelta
+import datetime
 
 from app.core.config import settings
 from app.core.utils import MembershipRole
@@ -8,10 +8,10 @@ ACCESS_TOKEN_EXPIRE_HOURS = 2
 
 
 def create_access_token(user_id: str, role: MembershipRole) -> str:
-    payload = {
+    payload: dict[str, str | MembershipRole | datetime.datetime] = {
         "sub": user_id,
         "role": role,
-        "exp": datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+        "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS)
     }
 
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
