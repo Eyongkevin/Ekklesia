@@ -3,6 +3,23 @@ from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.base import Base
 
+system_role_permissions = Table(
+    "system_role_permissions",
+    Base.metadata,
+    Column(
+        "system_role_id",
+        UUID(as_uuid=True),
+        ForeignKey("system_roles.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "permission_id",
+        UUID(as_uuid=True),
+        ForeignKey("permissions.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+)
+
 role_permissions = Table(
     "role_permissions",
     Base.metadata,
