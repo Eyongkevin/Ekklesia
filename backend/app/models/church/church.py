@@ -44,6 +44,7 @@ class Church(Base):
         onupdate=func.now()
     )
 
+    roles = relationship("Role", back_populates="church", cascade="all, delete-orphan")
     memberships = relationship("Membership", back_populates="church", cascade="all, delete-orphan")
     contact = relationship("ChurchContact", back_populates="church", uselist=False, cascade="all, delete-orphan")
     themes = relationship("ChurchTheme", back_populates="church", cascade="all, delete-orphan")

@@ -5,8 +5,55 @@ from argon2.exceptions import VerifyMismatchError
 from datetime import datetime
 
 from app.schemas.membership import Membership
+from app.schemas.permission import PermissionReq
 
 password_hasher = PasswordHasher()
+
+
+class PERMISSION:
+    # Announcement
+    ANNOUNCEMENT_CREATE = PermissionReq(
+        code="announcement:create",
+        name="Create Announcement",
+    )
+    ANNOUNCEMENT_READ = PermissionReq(
+        code="announcement:read",
+        name="View Announcements",
+    )
+    ANNOUNCEMENT_UPDATE = PermissionReq(
+        code="announcement:update",
+        name="Update Announcement",
+    )
+    ANNOUNCEMENT_DELETE = PermissionReq(
+        code="announcement:delete",
+        name="Delete Announcement",
+    )
+
+    # Invite
+    INVITE_CREATE = PermissionReq(
+        code="invite:create",
+        name="Create Invite",
+    )
+    INVITE_READ = PermissionReq(
+        code="invite:read",
+        name="View Invites",
+    )
+    INVITE_UPDATE = PermissionReq(
+        code="invite:update",
+        name="Update Invite",
+    )
+    INVITE_DELETE = PermissionReq(
+        code="invite:delete",
+        name="Delete Invite",
+    )
+
+    @classmethod
+    def all(cls) -> list[PermissionReq]:
+        return [
+            value
+            for value in cls.__dict__.values()
+            if isinstance(value, PermissionReq)
+        ]
 
 class MembershipRole(str, Enum):
     SUPER_ADMIN = "super_admin"
