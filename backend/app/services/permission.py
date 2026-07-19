@@ -1,4 +1,5 @@
 from typing import Optional
+import uuid
 
 from app.repositories.permission import PermissionCRUD
 from app.db.uow import UnitOfWork
@@ -26,3 +27,11 @@ class PermissionService:
     
     def get_by_code(self, code: str) -> Optional[Permission]:
         return self.permission_crud.get_by_code(code)
+    
+    def get_by_codes(self, codes: list[str]) -> list[Permission]:
+        permissions: list[Permission] = []
+        for code in codes:
+            permission = self.get_by_code(code)
+            if permission:
+                permissions.append(permission)
+        return permissions

@@ -1,4 +1,5 @@
 from typing import Optional
+import uuid
 
 from pydantic import BaseModel, ConfigDict
 
@@ -12,6 +13,7 @@ class PermissionBase(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 class PermissionRes(PermissionBase):
+    id: uuid.UUID
     model_config = ConfigDict(from_attributes=True)
 
 class PermissionReq(PermissionBase):
