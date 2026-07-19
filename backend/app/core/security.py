@@ -7,10 +7,9 @@ from app.core.utils import MembershipRole
 ACCESS_TOKEN_EXPIRE_HOURS = 2
 
 
-def create_access_token(user_id: str, role: MembershipRole) -> str:
+def create_access_token(user_id: str) -> str:
     payload: dict[str, str | MembershipRole | datetime.datetime] = {
         "sub": user_id,
-        "role": role,
         "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS)
     }
 
