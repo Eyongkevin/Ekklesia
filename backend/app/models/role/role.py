@@ -77,4 +77,4 @@ class Role(Base):
     )
 
     def __repr__(self) -> str:
-        return f'<Role name={self.name}, is_active={self.is_active}, is_system={self.is_system}>'
+        return f'{self.name}'

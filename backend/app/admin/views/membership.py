@@ -5,7 +5,7 @@ from sqladmin.filters import BooleanFilter
 from wtforms.validators import DataRequired, Optional
 from wtforms import SelectField
 
-from app.models import Membership
+from app.models import Membership, Role
 from app.models import User
 from app.services.user import UserService
 from app.db.uow import UnitOfWork
@@ -35,7 +35,7 @@ class MembershipAdmin(ModelView, model=Membership):
         "First Name",
         "Email",
         "Church Name",
-        "Role",
+        #"Role",
         Membership.is_active,
         "Created At",
     ]
@@ -51,17 +51,17 @@ class MembershipAdmin(ModelView, model=Membership):
         "Email": lambda m, a: get_email(m.user_id),
         "Church Name": lambda m, a: m.church.name if m.church else "N/A",
         "Created At": lambda m, a: format_datetime(m.created_at),
-        "Role": lambda m, a: m.role.replace("_", " ").title() if m.role else "N/A",
+        # "Role": lambda m, a: m.role.replace("_", " ").title() if m.role else "N/A",
     }
 
-    form_overrides = {
-        'role': SelectField
-    }
+    # form_overrides = {
+    #     'role': SelectField
+    # }
 
     form_columns = [
         "user",
         "church",
-        "role",
+        "roles",
         "is_active"
     ]
 
@@ -74,11 +74,11 @@ class MembershipAdmin(ModelView, model=Membership):
             "label": "Church",
             "validators": [Optional()]
         },
-        "role": {
-            "label": "Role",
-            "choices": ROLE_CHOICES,
-            "validators": [DataRequired()]
-        },
+        # "role": {
+        #     "label": "Role",
+        #     "choices": ROLE_CHOICES,
+        #     "validators": [DataRequired()]
+        # },
         "is_active": {
             "label": "Is Active",
             "validators": [DataRequired()]
@@ -102,11 +102,18 @@ class MembershipAdmin(ModelView, model=Membership):
             joinedload(Membership.church)
         )
 
+        query = query.options(
+            joinedload(Membership.roles)
+        )
+
         # Eager load church relationship to avoid N+1 problem when displaying church names
         query = query.filter(
             or_(
                 Membership.role == "super_admin",
-                Membership.role == "church_admin"
+                # Membership.role == "church_admin"
+                Membership.roles.any(
+                    Role.name.in_(["Super Admin", "Church Admin"])
+                )
             )
         )
 
