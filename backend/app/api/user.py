@@ -31,10 +31,10 @@ async def login_user(response: Response, payload:OAuth2PasswordRequestForm = Dep
         password=payload.password
     )
 
-    if user is None or not MembershipService(uow).check_is_church_admin(str(user.id)):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+    # if user is None or not MembershipService(uow).check_is_church_admin(str(user.id)):
+    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     
-    access_token: str = create_access_token(str(user.id), MembershipRole.CHURCH_ADMIN)
+    access_token: str = create_access_token(str(user.id))
 
     response.set_cookie(
         key="access_token",

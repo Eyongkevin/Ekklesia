@@ -1,11 +1,15 @@
 import random
+from typing import Any
 
+from fastapi import Request
 from sqladmin import ModelView
 from sqladmin.filters import BooleanFilter
 from wtforms.validators import DataRequired
 from wtforms import StringField
 
 from app.models import Church
+from app.db.uow import UnitOfWork
+from app.services import role as role_services
 
 IGNORE = {"of", "the", "and"}
 class ChurchAdmin(ModelView, model=Church):
@@ -60,6 +64,17 @@ class ChurchAdmin(ModelView, model=Church):
 
         if not form.get('code'):
             model.code = generate_code_from_name(form.get('name'))
+
+
+    async def after_model_change(self, data: dict, model: Any, is_created: bool, request: Request) -> None:
+        await super().after_model_change(data, model, is_created, request)
+
+        if not is_created:
+            return
+        
+        with UnitOfWork() as uow:
+            system_roles = role_services.SystemRoleService(uow).get_system_roles()
+            role_services.RoleService(uow).create_bulk_from_system(str(model.id), system_roles)
 
 
 def generate_code_from_name(name: str, random_length: int = 3) -> str:

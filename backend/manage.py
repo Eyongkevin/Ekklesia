@@ -10,6 +10,43 @@ from app.core.utils import hash_password
 app = typer.Typer(help="Manage Ekklesia backend tasks")
 
 
+from app.core.utils import PERMISSION
+from app.services.permission import PermissionService
+
+
+@app.command()
+def seedpermissions():
+    """
+    Seed application permissions.
+    """
+    typer.echo("Seeding permissions...")
+
+    with UnitOfWork() as uow:
+        permission_service = PermissionService(uow)
+
+        created = 0
+        skipped = 0
+
+        for permission in PERMISSION.all():
+            existing = permission_service.get_by_code(permission.code)
+
+            if existing:
+                skipped += 1
+                typer.echo(f"Skipping {permission.code}")
+                continue
+
+            new_permission = permission_service.create(permission)
+
+            if new_permission:
+                created += 1
+                typer.echo(f"Created {permission.code}")
+            else:
+                typer.echo(f"Permission {permission.code} Failed")
+
+        typer.echo(
+            f"\nDone! Created: {created}, Skipped: {skipped}"
+        )
+
 
 @app.command()
 def createsuperuser():

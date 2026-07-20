@@ -2,6 +2,7 @@ from app.repositories.church import ChurchCRUD, ContactCRUD, ThemeCRUD
 from app.db.uow import UnitOfWork
 from app.schemas import church as schema_church
 from app.services.membership import MembershipService
+from app.services.role import RoleService, SystemRoleService
 from app.models.church import ChurchContact, ChurchTheme, Church
 
 
@@ -13,9 +14,10 @@ class ChurchService:
 
     def create_church(self, name: str) -> Church:
         church = self.church_crud.create_church(name)
+
         self.uow.commit()
         return church
-    
+
     def get_church_by_id(self, church_id: str) -> Church | None:
         return self.church_crud.get_church_by_id(church_id)
 

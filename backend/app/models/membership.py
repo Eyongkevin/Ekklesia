@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.core.utils import MembershipRole
+from .associations import membership_roles
 
 
 class Membership(Base):
@@ -57,6 +58,12 @@ class Membership(Base):
 
     user = relationship("User", back_populates="memberships")
     church = relationship("Church", back_populates="memberships")
+
+    roles = relationship(
+        "Role",
+        secondary=membership_roles,
+        back_populates="memberships",
+    )
 
     __table_args__ = (
         UniqueConstraint("user_id", "church_id", name="uq_user_church"),
