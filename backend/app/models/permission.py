@@ -43,3 +43,6 @@ class Permission(Base):
 
     def __repr__(self) -> str:
         return f'<Permission code={self.code}, is_active={self.is_active}>'
+    
+    def __str__(self) -> str:
+        return self.code

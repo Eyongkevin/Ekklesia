@@ -17,6 +17,7 @@ def setup_admin(app):
     # Register views
     admin.add_view(views.UserAdmin)
     admin.add_view(views.ChurchAdmin)
+    admin.add_view(views.SystemRoleAdmin)
     admin.add_view(views.MembershipAdmin)
     admin.add_view(views.AnnouncementStatusAdmin)
     admin.add_view(views.AnnouncementTagAdmin)

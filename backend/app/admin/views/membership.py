@@ -1,9 +1,12 @@
+from fastapi import Request
 from operator import or_
-from sqladmin import ModelView
+from sqladmin import ModelView, expose
+from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from sqladmin.filters import BooleanFilter
 from wtforms.validators import DataRequired, Optional
 from wtforms import SelectField
+from starlette.responses import RedirectResponse
 
 from app.models import Membership, Role
 from app.models import User
@@ -31,11 +34,11 @@ def get_email(user_id: str) -> str:
 
 
 class MembershipAdmin(ModelView, model=Membership):
+    list_template = "sqladmin/custom_list.html"
     column_list = [
         "First Name",
         "Email",
         "Church Name",
-        #"Role",
         Membership.is_active,
         "Created At",
     ]
@@ -54,14 +57,9 @@ class MembershipAdmin(ModelView, model=Membership):
         # "Role": lambda m, a: m.role.replace("_", " ").title() if m.role else "N/A",
     }
 
-    # form_overrides = {
-    #     'role': SelectField
-    # }
-
     form_columns = [
         "user",
         "church",
-        "roles",
         "is_active"
     ]
 
@@ -74,11 +72,6 @@ class MembershipAdmin(ModelView, model=Membership):
             "label": "Church",
             "validators": [Optional()]
         },
-        # "role": {
-        #     "label": "Role",
-        #     "choices": ROLE_CHOICES,
-        #     "validators": [DataRequired()]
-        # },
         "is_active": {
             "label": "Is Active",
             "validators": [DataRequired()]
@@ -107,15 +100,77 @@ class MembershipAdmin(ModelView, model=Membership):
         )
 
         # Eager load church relationship to avoid N+1 problem when displaying church names
-        query = query.filter(
-            or_(
-                Membership.role == "super_admin",
-                # Membership.role == "church_admin"
-                Membership.roles.any(
-                    Role.name.in_(["Super Admin", "Church Admin"])
-                )
-            )
-        )
+        # query = query.filter(
+        #     or_(
+        #         Membership.role == "super_admin",
+        #         # Membership.role == "church_admin"
+        #         Membership.roles.any(
+        #             Role.name.in_(["Super Admin", "Church Admin"])
+        #         )
+        #     )
+        # )
 
         return query
 
+    def roles_url(self, request: Request, obj: Membership) -> str:
+        return f"/admin/membership/roles/{obj.id}"
+    
+    @expose("/roles/{pk}", methods=["GET", "POST"])
+    async def manage_roles(self, request: Request):
+        pk = request.path_params["pk"]
+
+        with UnitOfWork() as uow:
+            membership = (
+                uow.db.execute(
+                    select(Membership)
+                    .options(
+                        joinedload(Membership.roles),
+                        joinedload(Membership.user),
+                        joinedload(Membership.church),
+                    )
+                    .where(Membership.id == pk)
+                )
+                .unique()
+                .scalar_one()
+            )
+
+            roles = (
+                uow.db.execute(
+                    select(Role)
+                    .where(Role.church_id == membership.church_id)
+                    .order_by(Role.name)
+                )
+                .scalars()
+                .all()
+            )
+
+            if request.method == "POST":
+                form = await request.form()
+
+                selected_role_ids = form.getlist("roles")
+
+                selected_roles = (
+                    uow.db.execute(
+                        select(Role).where(Role.id.in_(selected_role_ids))
+                    )
+                    .scalars()
+                    .all()
+                )
+
+                membership.roles = selected_roles
+
+                uow.commit()
+
+                return RedirectResponse(
+                    url="/admin/membership/list",
+                    status_code=303,
+                )
+
+        return await self.templates.TemplateResponse(
+            request=request,
+            name="sqladmin/manage_roles.html",
+            context={
+                "membership": membership,
+                "roles": roles,
+            },
+        )
