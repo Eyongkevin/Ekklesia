@@ -109,11 +109,11 @@ class UserAdmin(ModelView, model=User):
         query = query.options(
             joinedload(User.memberships).joinedload(Membership.church)
         )
-        query = query.filter(
-            or_(
-                Membership.role == "super_admin",
-                Membership.role == "church_admin"
-            )
-        )
+        # query = query.filter(
+        #     or_(
+        #         Membership.role == "super_admin",
+        #         Membership.role == "church_admin"
+        #     )
+        # )
         
         return query.distinct()
