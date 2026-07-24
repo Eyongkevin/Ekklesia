@@ -25,6 +25,12 @@ def dashboard_sidebar():
         sidebar_item("Child Dedication", "baby", "child"),
         sidebar_item("Funeral", "cross", "funeral"),
 
+        rx.divider(),
+
+        rx.text("User Management", weight="bold"),
+
+        sidebar_item("Roles", "user-key", "role"),
+
         width="250px",
         height="100%",
         overflow_y="auto",

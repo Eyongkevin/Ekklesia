@@ -37,7 +37,7 @@ class Role(Base):
 
     template_version: Mapped[int] = mapped_column(
         Integer,
-        default=1,
+        nullable=True
     )
 
     is_customized: Mapped[bool] = mapped_column(

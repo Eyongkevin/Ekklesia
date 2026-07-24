@@ -23,10 +23,9 @@ class SystemRoleReq(SystemRoleBase):
 
 # Role
 class RoleBase(BaseModel):
-    church_id: uuid.UUID
     name: str
-    is_customized: bool
-    template_version: int
+    is_customized: bool = False
+    template_version: Optional[int] = None
     system_role_id: Optional[uuid.UUID] = None
     description: Optional[str] = None
     is_active: bool = True

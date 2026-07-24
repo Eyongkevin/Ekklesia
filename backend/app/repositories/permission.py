@@ -30,4 +30,7 @@ class PermissionCRUD:
     
     def get_by_code(self, code: str) -> Optional[Permission]:
         return self.db.query(Permission).filter(Permission.code==code).scalar()
+    
+    def get_by_name(self, name: str) -> Optional[Permission]:
+        return self.db.query(Permission).filter(Permission.name==name).scalar()
 

@@ -32,11 +32,11 @@ class RoleService:
         return created_roles
 
 
-    def create(self, role: role_schemas.RoleReq):
-        permissions: list[Permission] = permission_services.PermissionService(self.uow).get_by_codes(role.permissions)
+    def create(self, church_id: str, role: role_schemas.RoleReq):
+        permissions: list[Permission] = permission_services.PermissionService(self.uow).get_by_names(role.permissions)
 
         new_role = self.role_crud.create(
-            church_id=str(role.church_id),
+            church_id=church_id,
             name=role.name,
             template_version=role.template_version,
             system_role_id=str(role.system_role_id) if role.system_role_id else None,
@@ -48,5 +48,5 @@ class RoleService:
         return new_role
 
 
-    def get_system_roles(self, is_active:bool = True) -> list[SystemRole]:
+    def get_roles(self, is_active:bool = True) -> list[Role]:
         return self.role_crud.get_roles(is_active)

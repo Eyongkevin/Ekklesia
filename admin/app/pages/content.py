@@ -1,7 +1,7 @@
 import reflex as rx
 
 from app.states.dashboard import DashboardState
-from app.pages.contents import profile, announcement, invite
+from app.pages.contents import profile, announcement, invite, role
 
 def dashboard_content():
     return rx.box(
@@ -19,6 +19,7 @@ def dashboard_content():
             ("testimony", rx.text("Testimonies")),
             ("child", rx.text("Child Dedication")),
             ("funeral", rx.text("Funeral Requests")),
+            ("role", role.role_card()),
             rx.text("Page not found")
         ),
         height="100%",

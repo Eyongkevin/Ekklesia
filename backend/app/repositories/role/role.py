@@ -13,7 +13,7 @@ class RoleCRUD:
         self,
         church_id: str,
         name: str,
-        template_version: int = 1,
+        template_version: Optional[int] = None,
         system_role_id: Optional[str] = None,
         description: Optional[str] = None, 
         is_customized: bool = False,
