@@ -19,7 +19,7 @@ def dashboard_content():
             ("testimony", rx.text("Testimonies")),
             ("child", rx.text("Child Dedication")),
             ("funeral", rx.text("Funeral Requests")),
-            ("role", role.role_card()),
+            ("roles", role.role_card()),
             rx.text("Page not found")
         ),
         height="100%",

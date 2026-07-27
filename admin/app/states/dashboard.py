@@ -5,6 +5,7 @@ from app.states.status import StatusState
 from app.states.audience import AudienceState
 from app.states.church import ChurchState
 from app.states.invite import InviteFormState, InvitetListState
+from app.states.role import RoleFormState, RoleListState
 
 class DashboardState(rx.State):
     current_page: str = 'church'
@@ -34,6 +35,10 @@ class DashboardState(rx.State):
 
             invite_list_state = await self.get_state(InvitetListState)
             await invite_list_state.paginated_invites()
+
+        if page == 'roles':
+            role_list_state = await self.get_state(RoleListState)
+            await role_list_state.paginated_roles()
         self.current_page = page
 
     @rx.var

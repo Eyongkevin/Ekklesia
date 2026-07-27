@@ -34,6 +34,19 @@ class RoleCRUD:
 
         return role
     
-    def get_roles(self, is_active:bool) -> list[Role]:
-        return self.db.query(Role).filter(Role.is_active==is_active).all()
+    def get_roles(self, church_id: str, is_active:bool, search: str, offset: int=0, limit: int=10) -> dict[str, int | list[Role]]:
+        query = self.db.query(Role).filter(Role.church_id==church_id, Role.is_active==is_active)
+
+        if search:
+            query = query.filter(Role.name.ilike(f'%{search}%'))
+        total = query.count()
+        roles = (query
+                .order_by(Role.created_at.desc())
+                .offset(offset)
+                .limit(limit)
+                .all())
+        return {
+            'roles': roles,
+            'total': total
+        }
 

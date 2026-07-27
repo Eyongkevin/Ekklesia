@@ -1,9 +1,21 @@
 from typing import Optional, TypedDict, List
-from datetime import date
+from datetime import date, datetime
 import reflex as rx
 
 from app.states import permission as permission_states
 from app.services import role as role_services
+
+class RoleType(TypedDict):
+    id: str
+    system_role_id: Optional[str]
+    name: str
+    description: Optional[str]
+    is_active: bool
+    template_version: Optional[int]
+    is_customized: bool
+    created_at: datetime
+    modified_at: datetime
+    permissions: dict[str, str | bool | None]
 
 
 class RoleState(rx.State):
@@ -31,6 +43,8 @@ class RoleFilterState(rx.State):
 
     async def set_search(self, value: str):
         self.search = value
+        role_list_state = await self.get_state(RoleListState)
+        await role_list_state.paginated_roles()
 
 class RoleFormState(rx.State):
     id: str = ""
@@ -82,3 +96,36 @@ class RoleFormState(rx.State):
             yield rx.toast.success("Role created")
         except Exception as ex:
             yield rx.toast.error(f"Error submitting role")
+
+class RoleListState(rx.State):
+    roles: list[RoleType] = []
+
+    page: int = 1
+    per_page: int = 10
+    total_pages: int = 1
+
+    selected_ids: dict[str, str] = dict()
+    role_to_be_deleted: Optional[RoleType] = None
+
+    open_menu_id: int | None = None
+
+    show_view_modal: bool = False
+    selected_role: Optional[RoleType] = None
+    actions_value: str = ""
+    show_deletion_modal: bool = False
+
+    async def paginated_roles(self) -> None:
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+        filter_state = await self.get_state(RoleFilterState)
+
+        roles = role_services.get_roles(
+            access_token=auth_state.access_token,
+            search=filter_state.search,
+            page=self.page,
+            per_page=self.per_page
+        )
+
+        self.total_pages = roles.get('total', 0) // self.per_page + 1
+        self.roles = roles.get('roles', [])

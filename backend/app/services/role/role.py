@@ -48,5 +48,6 @@ class RoleService:
         return new_role
 
 
-    def get_roles(self, is_active:bool = True) -> list[Role]:
-        return self.role_crud.get_roles(is_active)
+    def get_roles(self, church_id: str, filters: role_schemas.RoleFilterOptions, is_active:bool = True) -> list[Role]:
+        offset = (filters.page - 1) * filters.per_page
+        return self.role_crud.get_roles(church_id, is_active, search=filters.search, offset=offset, limit=filters.per_page)

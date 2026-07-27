@@ -1,7 +1,8 @@
 from typing import Optional
 import uuid
+from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.schemas.permission import PermissionRes
 
@@ -32,9 +33,25 @@ class RoleBase(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+    @field_validator("description", mode="before")
+    @classmethod
+    def default_empty_string(cls, value):
+        return "" if value is None else value
+
 class RoleRes(RoleBase):
     id: uuid.UUID
+    created_at: datetime
+    modified_at: datetime
     permissions: list[PermissionRes]
 
 class RoleReq(RoleBase):
     permissions: list[str]
+
+class RoleListRes(BaseModel):
+    total: int
+    roles: list[RoleRes]
+
+class RoleFilterOptions(BaseModel):
+    search: str
+    page: int = 1
+    per_page: int = 10

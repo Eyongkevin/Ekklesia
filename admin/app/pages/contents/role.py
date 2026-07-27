@@ -1,8 +1,10 @@
 import reflex as rx
 from app.states import role as role_states
 from app.pages.components.form_label import form_label
+from app.pages.components.list_components import status_icon
 
 from app.states import permission as permission_states
+from app.utils import get_short_desc
 
 
 def role_card():
@@ -26,7 +28,7 @@ def role_card():
                 box_shadow="sm",
             ),
             rx.flex(
-                # announcement_list(),
+                role_list(),
                 padding="1em",
                 width="100%",
             ),
@@ -292,4 +294,152 @@ def role_form():
             gap="1em",
         ),
         padding="1em",
+    )
+
+
+def role_table_header():
+    return rx.hstack(
+        rx.text("Role", font_weight="bold", width="30%"),
+        rx.text("From system", font_weight="bold", width="10%"),
+        rx.text("Version", font_weight="bold", width="5%"),
+        rx.text("Active", font_weight="bold", width="5%"),
+        rx.text("Customized", font_weight="bold", width="10%"),
+        rx.text("Created At", font_weight="bold", width="10%"),
+        rx.text("Created By", font_weight="bold", width="20%"),
+        rx.text("Actions", font_weight="bold", width="10%"),
+        padding="0.75em",
+        border_bottom="1px solid #eaeaea",
+    )
+
+def role_table():
+    return rx.box(
+        role_table_header(),
+
+        rx.foreach(
+            role_states.RoleListState.roles,
+            role_row,
+        ),
+        width="100%",
+        border="1px solid #eaeaea",
+        border_radius="10px",
+        overflow="hidden",
+        bg="white",
+    )
+
+def role_row(role):
+    short_desc = get_short_desc(role["description"], 100)
+    return rx.hstack(
+
+        # 📄 Role (name + description)
+        rx.box(
+            rx.text(
+                role["name"],
+                font_weight="600",
+                font_size="14px",
+            ),
+            rx.text(
+                short_desc,
+                font_size="13px",
+                color="gray",
+                no_of_lines=2,
+            ),
+            width="30%",
+        ),
+
+        # 📌 From System
+        rx.box(
+            status_icon(role['system_role_id'] != None),
+            width="10%",
+
+        ),
+
+        # 📌 Version
+        rx.box(
+            rx.text(role['template_version']),
+            width="5%",
+        ),
+
+        # 📌 Active
+        rx.box(
+            status_icon(role['is_active']),
+            width="5%",
+        ),
+
+        # 📌 Customized
+        rx.box(
+            status_icon(role['is_customized']),
+            width="10%",
+        ),
+
+        # 📅 Created At
+        rx.box(
+            rx.text(
+                rx.cond(
+                    role["created_at"],
+                    rx.moment(
+                        role["created_at"],
+                        format="MMM D, YYYY",
+                    ),
+                    "-"
+                ),
+                font_size="13px",
+            ),
+            width="10%",
+        ),
+        
+        # 📅 Created By
+        rx.box(
+            rx.text(
+                "Kevin Enow",
+                font_size="13px",
+            ),
+            width="20%",
+        ),
+
+        # ⚙️ Actions
+        rx.box(
+            rx.fragment(
+                role_actions_menu(role),
+                # announcement_view_modal(),
+            ),
+            text_align="right",
+        ),
+        padding="0.75em",
+        align="center",
+        border_bottom="1px solid #f1f1f1",
+    )
+
+def role_actions_menu(role):
+    return rx.menu.root(
+        rx.menu.trigger(
+            rx.text("⋮", font_size="22px", cursor="pointer"),
+        ),
+        rx.menu.content(
+            rx.menu.item(
+                "View",
+                # on_click=lambda: AnnouncementListState.open_view_modal(announcement),
+            ),
+            rx.menu.item(
+                "Edit",
+                # on_click=lambda: AnnouncementListState.update_announcement(announcement),
+            ),
+            rx.menu.item(
+                "Activate",
+                # on_click=lambda: AnnouncementListState.update_announcement(announcement),
+            ),
+            rx.menu.separator(),
+            rx.menu.item(
+                "Delete",
+                # on_click=lambda: AnnouncementListState.open_delete_modal(announcement),
+                color="red",
+            ),
+        ),
+    )
+
+def role_list():
+    return rx.vstack(
+        role_table(),
+        # pagination_controls(AnnouncementListState),
+        width="100%",
+        spacing="4",
     )

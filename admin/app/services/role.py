@@ -30,3 +30,15 @@ def create(access_token: str,
 
     response.raise_for_status()
     return response.json()
+
+def get_roles(access_token: str, search: str, page: int=1, per_page: int = 10) -> list[dict]:
+    params = {
+        'search': search,
+        'page': page,
+        'per_page': per_page
+    }
+    response = httpx.get(f"{settings.BASE_URL}/roles/", params=params, headers={
+                    "Authorization": f"Bearer {access_token}"
+                })
+    response.raise_for_status()
+    return response.json()
