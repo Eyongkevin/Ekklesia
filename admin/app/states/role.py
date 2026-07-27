@@ -92,6 +92,8 @@ class RoleFormState(rx.State):
                 description = self.description,
                 permissions = self.selected_permissions
             )
+            role_list_state = await self.get_state(RoleListState)
+            await role_list_state.paginated_roles()
             self.reset_form()
             yield rx.toast.success("Role created")
         except Exception as ex:
