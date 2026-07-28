@@ -15,7 +15,7 @@ class RoleType(TypedDict):
     is_customized: bool
     created_at: datetime
     modified_at: datetime
-    permissions: dict[str, str | bool | None]
+    permissions: list[dict[str, str | bool | None]]
 
 
 class RoleState(rx.State):
@@ -115,6 +115,17 @@ class RoleListState(rx.State):
     selected_role: Optional[RoleType] = None
     actions_value: str = ""
     show_deletion_modal: bool = False
+
+
+    @rx.event
+    def open_view_modal(self, role: RoleType):
+        self.selected_role = role
+        self.show_view_modal = True
+
+    @rx.event
+    def close_view_modal(self):
+        self.selected_role = None
+        self.show_view_modal = False
 
     async def paginated_roles(self) -> None:
         from app.states.auth import AuthState

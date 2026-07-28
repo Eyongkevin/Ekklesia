@@ -5,6 +5,7 @@ from app.pages.components.list_components import status_icon
 
 from app.states import permission as permission_states
 from app.utils import get_short_desc
+from app.pages.components.view_announcement import section_title, info_item
 
 
 def role_card():
@@ -400,7 +401,7 @@ def role_row(role):
         rx.box(
             rx.fragment(
                 role_actions_menu(role),
-                # announcement_view_modal(),
+                role_view_modal(),
             ),
             text_align="right",
         ),
@@ -417,7 +418,7 @@ def role_actions_menu(role):
         rx.menu.content(
             rx.menu.item(
                 "View",
-                # on_click=lambda: AnnouncementListState.open_view_modal(announcement),
+                on_click=lambda: role_states.RoleListState.open_view_modal(role),
             ),
             rx.menu.item(
                 "Edit",
@@ -435,6 +436,186 @@ def role_actions_menu(role):
             ),
         ),
     )
+
+def role_view_modal():
+    role = role_states.RoleListState.selected_role
+
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.hstack(
+                    rx.vstack(
+                        rx.heading(
+                            role["name"],
+                            size="6",
+                        ),
+                        align_items="start",
+                        spacing="2",
+                    ),
+
+                    rx.spacer(),
+
+                    rx.icon_button(
+                        rx.icon("x"),
+                        variant="ghost",
+                        on_click=role_states.RoleListState.close_view_modal,
+                    ),
+
+                    width="100%",
+                    align="start",
+                ),
+
+                rx.divider(),
+
+                rx.vstack(
+                    rx.box(
+                        rx.cond(
+                            role["description"],
+                            rx.text(
+                                role["description"],
+                                white_space="pre-wrap",
+                                line_height="1.8",
+                                size="3",
+                            ),
+                            rx.text(
+                                "No description.",
+                                color="gray",
+                            ),
+                        ),
+                        bg="var(--gray-2)",
+                        padding="18px",
+                        border_radius="12px",
+                        width="100%",
+                    ),
+                    spacing="3",
+                    width="100%",
+                    align_items="start",
+                ),
+                rx.card(
+                    rx.vstack(
+                        section_title(
+                            "user-key",
+                            "Permissions",
+                        ),
+
+                        rx.flex(
+                            rx.cond(
+                                role["permissions"],
+                                rx.foreach(
+                                    role["permissions"],
+                                    lambda permission: rx.badge(
+                                        permission["name"],
+                                        color_scheme="purple",
+                                        variant="soft",
+                                    ),
+                                ),
+                                rx.text(
+                                    "No permissions",
+                                    color="gray",
+                                ),
+                            ),
+
+                            wrap="wrap",
+                            spacing="2",
+                        ),
+                        spacing="4",
+                        width="100%",
+                        align_items="start",
+                    ),
+                    width="100%",
+                ),
+                rx.card(
+                    rx.vstack(
+
+                        section_title(
+                            "info",
+                            "Role Information",
+                        ),
+
+                        rx.grid(
+
+                            info_item(
+                                "Created By",
+                                rx.text(
+                                    "-",
+                                    font_weight="600",
+                                ),
+                            ),
+                            info_item(
+                                "Created At",
+
+                                rx.moment(
+                                    role["created_at"],
+                                    format="MMM DD, YYYY • hh:mm A",
+                                ),
+                            ),
+
+                            info_item(
+                                "Modified At",
+
+                                rx.moment(
+                                    role["modified_at"],
+                                    format="MMM DD, YYYY • hh:mm A",
+                                ),
+                            ),
+
+                            columns="3",
+                            spacing="2",
+                            width="100%",
+                            font_size="12px",
+                        ),
+
+                        spacing="2",
+                        width="100%",
+                        align_items="start",
+                    ),
+
+                    width="100%",
+                ),
+                rx.flex(
+                    rx.hstack(
+                        # DELETE
+                        rx.button(
+                            rx.icon("trash-2", size=16),
+                            rx.text("Delete"),
+                            color_scheme="red",
+                            variant="soft",
+                            # on_click=lambda: AnnouncementListState.open_delete_modal(announcement),
+                            spacing="2",
+                        ),
+                        # UPDATE
+                        rx.button(
+                            rx.icon("square-pen", size=16),
+                            rx.text("Update"),
+
+                            color_scheme="blue",
+
+                            # on_click=lambda: AnnouncementListState.update_announcement(
+                            #     announcement
+                            # ),
+
+                            spacing="2",
+                        ),
+                        spacing="3",
+                    ),
+
+                    rx.spacer(),
+
+                    # CANCEL
+                    rx.button(
+                        "Close",
+                        variant="soft",
+                        # on_click=AnnouncementListState.close_view_modal,
+                    ),
+
+                    width="100%",
+                    align="center",
+                ),
+            )
+        ),
+        open=role_states.RoleListState.show_view_modal
+    )
+
 
 def role_list():
     return rx.vstack(
