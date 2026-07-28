@@ -605,7 +605,7 @@ def role_view_modal():
                     rx.button(
                         "Close",
                         variant="soft",
-                        # on_click=AnnouncementListState.close_view_modal,
+                        on_click=role_states.RoleListState.close_view_modal,
                     ),
 
                     width="100%",
