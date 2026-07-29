@@ -300,14 +300,14 @@ def role_form():
 
 def role_table_header():
     return rx.hstack(
-        rx.text("Role", font_weight="bold", width="30%"),
-        rx.text("From system", font_weight="bold", width="10%"),
-        rx.text("Version", font_weight="bold", width="5%"),
-        rx.text("Active", font_weight="bold", width="5%"),
-        rx.text("Customized", font_weight="bold", width="10%"),
-        rx.text("Created At", font_weight="bold", width="10%"),
-        rx.text("Created By", font_weight="bold", width="20%"),
-        rx.text("Actions", font_weight="bold", width="10%"),
+        rx.text("Role", font_weight="bold", width="30%", size="2"),
+        rx.text("From system", font_weight="bold", width="10%", size="2"),
+        rx.text("Version", font_weight="bold", width="5%", size="2"),
+        rx.text("Active", font_weight="bold", width="5%", size="2"),
+        rx.text("Customized", font_weight="bold", width="10%", size="2"),
+        rx.text("Created At", font_weight="bold", width="10%", size="2"),
+        rx.text("Created By", font_weight="bold", width="20%", size="2"),
+        rx.text("Actions", font_weight="bold", width="10%", size="2"),
         padding="0.75em",
         border_bottom="1px solid #eaeaea",
     )
@@ -350,26 +350,26 @@ def role_row(role):
         # 📌 From System
         rx.box(
             status_icon(role['system_role_id'] != None),
-            width="10%",
+            width="9%",
 
         ),
 
         # 📌 Version
         rx.box(
             rx.text(role['template_version']),
-            width="5%",
+            width="4%",
         ),
 
         # 📌 Active
         rx.box(
             status_icon(role['is_active']),
-            width="5%",
+            width="6%",
         ),
 
         # 📌 Customized
         rx.box(
             status_icon(role['is_customized']),
-            width="10%",
+            width="7%",
         ),
 
         # 📅 Created At
@@ -394,7 +394,7 @@ def role_row(role):
                 "Kevin Enow",
                 font_size="13px",
             ),
-            width="20%",
+            width="19%",
         ),
 
         # ⚙️ Actions
