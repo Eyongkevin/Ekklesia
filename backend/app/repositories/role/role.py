@@ -50,3 +50,7 @@ class RoleCRUD:
             'total': total
         }
 
+    def get_by_id(self, role_id: str) -> Role | None:
+            role = self.db.query(Role).get(role_id)
+            return role
+

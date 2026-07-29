@@ -55,3 +55,6 @@ class RoleFilterOptions(BaseModel):
     search: str
     page: int = 1
     per_page: int = 10
+
+class RoleUpdate(RoleBase):
+    permissions: list[str]

@@ -422,7 +422,7 @@ def role_actions_menu(role):
             ),
             rx.menu.item(
                 "Edit",
-                # on_click=lambda: AnnouncementListState.update_announcement(announcement),
+                on_click=lambda: role_states.RoleListState.update_role(role),
             ),
             rx.menu.item(
                 "Activate",
@@ -590,9 +590,9 @@ def role_view_modal():
 
                             color_scheme="blue",
 
-                            # on_click=lambda: AnnouncementListState.update_announcement(
-                            #     announcement
-                            # ),
+                            on_click=lambda: role_states.RoleListState.update_role(
+                                role
+                            ),
 
                             spacing="2",
                         ),

@@ -88,14 +88,20 @@ class RoleFormState(rx.State):
         try:
             role_services.create(
                 access_token= auth_state.access_token,
+                id=self.id,
                 name=self.name,
                 description = self.description,
                 permissions = self.selected_permissions
             )
+            if self.id:
+                yield rx.toast.success("Role updated")
+            else:
+                yield rx.toast.success("Role created")
+
             role_list_state = await self.get_state(RoleListState)
             await role_list_state.paginated_roles()
             self.reset_form()
-            yield rx.toast.success("Role created")
+            
         except Exception as ex:
             yield rx.toast.error(f"Error submitting role")
 
@@ -142,3 +148,19 @@ class RoleListState(rx.State):
 
         self.total_pages = roles.get('total', 0) // self.per_page + 1
         self.roles = roles.get('roles', [])
+
+    @rx.event
+    async def update_role(self, role: RoleType):
+        form_state = await self.get_state(RoleFormState)
+        form_state.id = role['id']
+        form_state.name = role['name']
+        form_state.description = role['description']
+        form_state.selected_permissions = [permission['name'] for permission in role['permissions']]
+
+        self.show_view_modal = False
+
+        role_state = await self.get_state(RoleState)
+        await role_state.open_add_update_drawer()
+
+
+
