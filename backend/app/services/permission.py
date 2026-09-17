@@ -28,10 +28,21 @@ class PermissionService:
     def get_by_code(self, code: str) -> Optional[Permission]:
         return self.permission_crud.get_by_code(code)
     
+    def get_by_name(self, name: str) -> Optional[Permission]:
+        return self.permission_crud.get_by_name(name)
+    
     def get_by_codes(self, codes: list[str]) -> list[Permission]:
         permissions: list[Permission] = []
         for code in codes:
             permission = self.get_by_code(code)
+            if permission:
+                permissions.append(permission)
+        return permissions
+    
+    def get_by_names(self, names: list[str]) -> list[Permission]:
+        permissions: list[Permission] = []
+        for name in names:
+            permission = self.get_by_name(name)
             if permission:
                 permissions.append(permission)
         return permissions

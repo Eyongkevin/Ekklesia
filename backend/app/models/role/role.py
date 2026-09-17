@@ -34,10 +34,11 @@ class Role(Base):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_system: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_protected: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
 
     template_version: Mapped[int] = mapped_column(
         Integer,
-        default=1,
+        nullable=True
     )
 
     is_customized: Mapped[bool] = mapped_column(

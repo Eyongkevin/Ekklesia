@@ -1,5 +1,8 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from app.models.user import User
+from app.models.membership import Membership
+from app.models.role import Role
 
 
 class UserCRUD:
@@ -31,3 +34,42 @@ class UserCRUD:
         self.db.add(new_user)
 
         return new_user
+
+    def get_users_by_role(self, role_id: str) -> list[User]:
+        query = (
+            select(User)
+            .join(User.memberships)
+            .join(Membership.roles)
+            .where(Role.id == role_id)
+            .distinct()
+        )
+        return self.db.scalars(query).all()
+
+    def has_role(self, user_id: str, role_id: str) -> bool:
+        query = (
+            select(User)
+            .join(User.memberships)
+            .join(Membership.roles)
+            .where(Role.id == role_id, User.id == user_id)
+        ).exists()
+        return bool(self.db.scalar(select(query)))
+
+    def assign_role(
+        self,
+        user_id: str,
+        role: Role,
+    ) -> Membership:
+        membership = self.db.scalar(
+            select(Membership)
+            .where(Membership.user_id == user_id)
+        )
+
+        if not membership:
+            raise ValueError("Membership not found")
+
+        if role not in membership.roles:
+            membership.roles.append(role)
+
+        self.db.flush()
+
+        return membership
