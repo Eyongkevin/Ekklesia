@@ -1,8 +1,8 @@
 from typing import Optional
 
-from sqlalchemy.orm import Session
-from app.models import Role
-from app.models import Permission
+from sqlalchemy import select
+from sqlalchemy.orm import Session, joinedload
+from app.models import Role, Permission, Membership
 
 
 class RoleCRUD:
@@ -33,7 +33,10 @@ class RoleCRUD:
         self.db.add(role)
 
         return role
-    
+
+    def get_all_roles(self, church_id: str, is_active: bool) -> list[Role]:
+        return self.db.query(Role).filter(Role.church_id==church_id,  Role.is_active==is_active).all()
+
     def get_roles(self, church_id: str, is_active:bool, search: str, offset: int=0, limit: int=10) -> dict[str, int | list[Role]]:
         query = self.db.query(Role).filter(Role.church_id==church_id, Role.is_active==is_active)
 
@@ -51,6 +54,24 @@ class RoleCRUD:
         }
 
     def get_by_id(self, role_id: str) -> Role | None:
-            role = self.db.query(Role).get(role_id)
-            return role
+        role = self.db.query(Role).get(role_id)
+        return role
+
+    def get_by_name(self, role_name: str) -> Role | None:
+        role = self.db.query(Role).filter(Role.name == role_name).first()
+        return role
+
+    def get_by_id_with_memberships(self, role_id: str) -> Role | None:
+        stmt = (
+            select(Role)
+            .options(
+                joinedload(Role.memberships).joinedload(Membership.user)
+            )
+            .where(Role.id == role_id)
+        )
+
+        return self.db.execute(stmt).unique().scalar_one_or_none()
+
+    def delete(self, role: Role) -> None:
+        self.db.delete(role)
 

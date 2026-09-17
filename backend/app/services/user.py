@@ -64,3 +64,12 @@ class UserService:
     
     def get_user_by_id(self, user_id: str) -> User | None:
         return self.user_crud.get_user_by_id(user_id)
+
+    def get_users_by_role(self, role_id: str) -> list[User]:
+        return self.user_crud.get_users_by_role(role_id)
+
+    def has_role(self, user_id: str, role_id: str) -> bool:
+        return self.user_crud.has_role(user_id, role_id)
+
+    def assign_role(self, user_id: str, role):
+        return self.user_crud.assign_role(self, user_id, role)

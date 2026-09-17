@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.schemas.permission import PermissionRes
+from app.schemas.membership import Membership
 
 # System Role
 class SystemRoleBase(BaseModel):
@@ -30,6 +31,7 @@ class RoleBase(BaseModel):
     system_role_id: Optional[uuid.UUID] = None
     description: Optional[str] = None
     is_active: bool = True
+    is_protected: bool = False
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -43,6 +45,7 @@ class RoleRes(RoleBase):
     created_at: datetime
     modified_at: datetime
     permissions: list[PermissionRes]
+    memberships: list[Membership]
 
 class RoleReq(RoleBase):
     permissions: list[str]
@@ -51,6 +54,9 @@ class RoleListRes(BaseModel):
     total: int
     roles: list[RoleRes]
 
+class RoleAllRes(BaseModel):
+    name: str
+
 class RoleFilterOptions(BaseModel):
     search: str
     page: int = 1
@@ -58,3 +64,6 @@ class RoleFilterOptions(BaseModel):
 
 class RoleUpdate(RoleBase):
     permissions: list[str]
+
+class RoleMerge(BaseModel):
+    target_role_name: str

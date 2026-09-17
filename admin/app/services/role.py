@@ -55,3 +55,33 @@ def get_roles(access_token: str, search: str, page: int=1, per_page: int = 10) -
                 })
     response.raise_for_status()
     return response.json()
+
+def get_all_roles(access_token: str) -> list[dict]:
+    response = httpx.get(f"{settings.BASE_URL}/roles/all/", headers={
+                    "Authorization": f"Bearer {access_token}"
+                })
+    response.raise_for_status()
+    return response.json()
+
+def get_role_with_membership(access_token: str, role_id: str):
+    response = httpx.get(f"{settings.BASE_URL}/roles/{role_id}/", headers={
+            "Authorization": f"Bearer {access_token}"
+    })
+    response.raise_for_status()
+    return response.json()
+
+def merge_role(access_token: str, source_role_id: str, target_role_name: str):
+    response = httpx.post(f"{settings.BASE_URL}/roles/{source_role_id}/merge/", json={
+            "target_role_name": target_role_name,
+        },
+        headers={
+                "Authorization": f"Bearer {access_token}"
+        })
+    response.raise_for_status()
+    return response.json()
+
+def delete_role(access_token: str, role_id: str) -> None:
+    response = httpx.delete(f"{settings.BASE_URL}/roles/{role_id}/", headers={
+                    "Authorization": f"Bearer {access_token}"
+                })
+    response.raise_for_status()

@@ -11,6 +11,7 @@ class RoleType(TypedDict):
     name: str
     description: Optional[str]
     is_active: bool
+    is_protected: bool
     template_version: Optional[int]
     is_customized: bool
     created_at: datetime
@@ -37,6 +38,7 @@ class RoleState(rx.State):
         
         role_form_state = await self.get_state(RoleFormState)
         role_form_state.reset_form()
+
 
 class RoleFilterState(rx.State):
     search: str = ""
@@ -113,7 +115,9 @@ class RoleListState(rx.State):
     total_pages: int = 1
 
     selected_ids: dict[str, str] = dict()
-    role_to_be_deleted: Optional[RoleType] = None
+    roles_to_be_deleted: list[RoleType]
+    users_first_name: list[str]
+    show_before_deletion_modal: bool = False
 
     open_menu_id: int | None = None
 
@@ -122,6 +126,19 @@ class RoleListState(rx.State):
     actions_value: str = ""
     show_deletion_modal: bool = False
 
+    all_role_names: list[dict[str, str]]
+    role_name_to_be_replaced_with: str
+
+
+    @rx.event
+    def open_deletion_modal(self):
+        self.show_deletion_modal = True
+        self.show_view_modal = False
+
+    @rx.event
+    def close_deletion_modal(self):
+        self.roles_to_be_deleted = []
+        self.show_deletion_modal = False
 
     @rx.event
     def open_view_modal(self, role: RoleType):
@@ -132,6 +149,24 @@ class RoleListState(rx.State):
     def close_view_modal(self):
         self.selected_role = None
         self.show_view_modal = False
+
+    @rx.event
+    def open_before_deletion_modal(self, users_first_name: list[str]):
+        self.users_first_name = users_first_name
+        self.show_before_deletion_modal = True
+
+    @rx.event
+    def close_before_deletion_modal(self):
+        self.role_name_to_be_replaced_with = ""
+        self.show_before_deletion_modal = False
+
+    @rx.event
+    def set_role_name_to_be_replaced_with(self, value: str) -> None:
+        self.role_name_to_be_replaced_with = value
+
+    @rx.var
+    def role_name_to_be_replaced_with_is_not_set(self) -> bool:
+        return len(self.role_name_to_be_replaced_with) == 0
 
     async def paginated_roles(self) -> None:
         from app.states.auth import AuthState
@@ -151,6 +186,9 @@ class RoleListState(rx.State):
 
     @rx.event
     async def update_role(self, role: RoleType):
+        if role['is_protected']:
+            return
+
         form_state = await self.get_state(RoleFormState)
         form_state.id = role['id']
         form_state.name = role['name']
@@ -162,5 +200,62 @@ class RoleListState(rx.State):
         role_state = await self.get_state(RoleState)
         await role_state.open_add_update_drawer()
 
+    @rx.event
+    async def get_all_roles(self, excluded_role_name:str):
+        from app.states.auth import AuthState
+        
+        auth_state = await self.get_state(AuthState)
 
+        all_role_names = role_services.get_all_roles(access_token=auth_state.access_token)
+        self.all_role_names = [role  for role in all_role_names if role['name'] != excluded_role_name]
 
+    @rx.var
+    def get_all_role_names(self) -> list[str]:
+        return [role["name"] for role in self.all_role_names]
+
+    @rx.event
+    async def delete(self, role: RoleType):
+        from app.states.auth import AuthState
+        
+        auth_state = await self.get_state(AuthState)
+        role_memberships = role_services.get_role_with_membership(auth_state.access_token, role['id'])
+        self.roles_to_be_deleted = [role]
+
+        if role_memberships['memberships']:
+            await self.get_all_roles(role["name"])
+            users_first_name = [membership['user']['first_name'] for membership in role_memberships['memberships']]
+            self.open_before_deletion_modal(users_first_name)
+        else:
+            self.open_deletion_modal()
+
+    @rx.event
+    async def delete_on_confirmation(self):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+
+        try:
+            if len(self.roles_to_be_deleted) == 1:
+                role_services.delete_role(auth_state.access_token, self.roles_to_be_deleted[0]['id'])
+
+                yield rx.toast.success("Role deleted successfully")
+
+                self.close_deletion_modal()
+
+                role_list_state = await self.get_state(RoleListState)
+                await role_list_state.paginated_roles()
+            else:
+                raise NotImplementedError("Multiple Roles can't be deleted for now")
+        except Exception as ex:
+            yield rx.toast.error("Error deleting role")
+            # error = ex.response.json()
+            # yield rx.toast.error(error.get("detail", "Error deleting role"))
+
+    # @rx.event
+    # async def merge_role(self):
+    #     from app.states.auth import AuthState
+                
+    #     auth_state = await self.get_state(AuthState)
+    #     role_services.merge_role(auth_state.access_token, self.role_to_be_deleted.get('id'), self.role_name_to_be_replaced_with)
+
+    #     self.close_before_deletion_modal()

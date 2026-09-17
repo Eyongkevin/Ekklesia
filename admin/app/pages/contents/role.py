@@ -6,6 +6,7 @@ from app.pages.components.list_components import status_icon
 from app.states import permission as permission_states
 from app.utils import get_short_desc
 from app.pages.components.view_announcement import section_title, info_item
+from app.pages.components.role import delete_confirmation_modal
 
 
 def role_card():
@@ -19,7 +20,8 @@ def role_card():
             rx.hstack(
                 rx.fragment(
                     role_actions(),
-                    # announcement_delete_modal()
+                    delete_confirmation_modal(),
+                    role_view_modal()
                 ),
                 rx.spacer(),
                 role_filters(),
@@ -401,7 +403,7 @@ def role_row(role):
         rx.box(
             rx.fragment(
                 role_actions_menu(role),
-                role_view_modal(),
+                # role_view_modal(),
             ),
             text_align="right",
         ),
@@ -420,19 +422,27 @@ def role_actions_menu(role):
                 "View",
                 on_click=lambda: role_states.RoleListState.open_view_modal(role),
             ),
-            rx.menu.item(
-                "Edit",
-                on_click=lambda: role_states.RoleListState.update_role(role),
+            rx.cond(
+                role['is_protected'],
+                rx.menu.item("Edit", disabled=True),
+                rx.menu.item(
+                    "Edit",
+                    on_click=lambda: role_states.RoleListState.update_role(role),
+                ),
             ),
             rx.menu.item(
                 "Activate",
                 # on_click=lambda: AnnouncementListState.update_announcement(announcement),
             ),
             rx.menu.separator(),
-            rx.menu.item(
-                "Delete",
-                # on_click=lambda: AnnouncementListState.open_delete_modal(announcement),
-                color="red",
+            rx.cond(
+                role['is_protected'],
+                rx.menu.item("Delete", disabled=True, color="red"),
+                rx.menu.item(
+                    "Delete",
+                    on_click=lambda: role_states.RoleListState.delete(role),
+                    color="red",
+                ),
             ),
         ),
     )
@@ -580,7 +590,8 @@ def role_view_modal():
                             rx.text("Delete"),
                             color_scheme="red",
                             variant="soft",
-                            # on_click=lambda: AnnouncementListState.open_delete_modal(announcement),
+                            on_click=lambda: role_states.RoleListState.delete(role),
+                            disabled=role['is_protected'],
                             spacing="2",
                         ),
                         # UPDATE
@@ -593,6 +604,7 @@ def role_view_modal():
                             on_click=lambda: role_states.RoleListState.update_role(
                                 role
                             ),
+                            disabled=role['is_protected'],
 
                             spacing="2",
                         ),
@@ -616,6 +628,89 @@ def role_view_modal():
         open=role_states.RoleListState.show_view_modal
     )
 
+def role_before_deletion_modal():
+    role = role_states.RoleListState.roles_to_be_deleted
+    users_first_name = role_states.RoleListState.users_first_name
+
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.vstack(
+                rx.icon("triangle-alert", size=30, color="red"),
+                rx.heading("Please Confirm", size="4"),
+                rx.dialog.description(
+                    rx.text(
+                        "The role ",
+                        rx.text.span(
+                            role[0]["name"],
+                            color="#60A5FA",
+                            # font_weight="bold",
+                        ),
+                        f" is assigned to {users_first_name.length()} user(s).",
+                    ),
+                    rx.text(
+                        "Replace the role before you can delete it", 
+                        size="1", 
+                        color="#D10D0D",
+                        align="center"
+                    )
+                ),
+                align="center"
+            ),
+            rx.flex(
+                rx.inset(
+                    rx.list.unordered(
+                        rx.foreach(
+                            users_first_name,
+                            lambda first_name: rx.list.item(
+                                first_name,
+                                font_size="12px",
+                                padding="2px 4px",
+                                width="100%",
+                            ),
+                        ),
+                        
+                    ),
+                    side="x",
+                    margin_top="24px",
+                    margin_bottom="24px"
+                ),
+                width="100%",
+                margin_left="40px"
+                #justify="center",
+            ),
+            
+            rx.flex(
+                rx.select(
+                    role_states.RoleListState.get_all_role_names,
+                    value=role_states.RoleListState.role_name_to_be_replaced_with,
+                    on_change=role_states.RoleListState.set_role_name_to_be_replaced_with,
+                    placeholder="Replace with…",
+                ),
+                margin_bottom="24px",
+                width="100%",
+                justify="center",
+            ),
+            rx.flex(
+                rx.dialog.close(
+                    rx.button(
+                        "Replace & Delete", 
+                        color_scheme="red",
+                        disabled=role_states.RoleListState.role_name_to_be_replaced_with_is_not_set,
+                        # on_click= role_states.RoleListState.merge_role
+                        )
+                ),
+                rx.dialog.close(
+                    rx.button("Cancel", variant="soft", color_scheme="gray", on_click=role_states.RoleListState.close_before_deletion_modal),
+                ),
+                spacing="3",
+                justify="end",
+            ),
+            max_width="450px",
+            width="95vw",
+            padding="24px",
+        ),
+        open=role_states.RoleListState.show_before_deletion_modal,
+    )
 
 def role_list():
     return rx.vstack(
