@@ -59,6 +59,10 @@ class RoleAllRes(BaseModel):
 
 class RoleFilterOptions(BaseModel):
     search: str
+    from_system: str
+    version: str
+    active: str
+    customized: str
     page: int = 1
     per_page: int = 10
 

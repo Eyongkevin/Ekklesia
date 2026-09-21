@@ -37,11 +37,37 @@ class RoleCRUD:
     def get_all_roles(self, church_id: str, is_active: bool) -> list[Role]:
         return self.db.query(Role).filter(Role.church_id==church_id,  Role.is_active==is_active).all()
 
-    def get_roles(self, church_id: str, is_active:bool, search: str, offset: int=0, limit: int=10) -> dict[str, int | list[Role]]:
+    def get_unique_template_versions(self):
+        return (
+            self.db.query(Role.template_version)
+            .distinct()
+            .all()
+        )
+
+    def get_roles(
+            self, 
+            church_id: str, 
+            is_active:bool, 
+            search: str,
+            from_system: Optional[bool],
+            version: Optional[int],
+            # active: str,
+            customized: Optional[bool],
+            offset: int=0, 
+            limit: int=10) -> dict[str, int | list[Role]]:
         query = self.db.query(Role).filter(Role.church_id==church_id, Role.is_active==is_active)
 
         if search:
             query = query.filter(Role.name.ilike(f'%{search}%'))
+        if from_system is not None:
+            if from_system:
+                query = query.filter(Role.system_role_id.is_not(None))
+            else:
+                query = query.filter(Role.system_role_id.is_(None))
+        if version:
+            query = query.filter(Role.template_version==version)
+        if customized is not None:
+            query = query.filter(Role.is_customized.is_(customized))
         total = query.count()
         roles = (query
                 .order_by(Role.created_at.desc())

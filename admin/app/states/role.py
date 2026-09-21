@@ -22,6 +22,13 @@ class RoleType(TypedDict):
 class RoleState(rx.State):
     show_add_update_drawer: bool = False
 
+    @rx.var
+    def get_template_versions(self) -> list[str]:
+        return ["All"] + [
+            str(version)
+            for version in role_services.get_template_versions()
+        ]
+
     @rx.event
     async def open_add_update_drawer(self):
         from app.states.auth import AuthState
@@ -42,9 +49,33 @@ class RoleState(rx.State):
 
 class RoleFilterState(rx.State):
     search: str = ""
+    from_system: str = "All"
+    version: str = "All"
+    active: str = "All"
+    customized: str = "All"
 
     async def set_search(self, value: str):
         self.search = value
+        role_list_state = await self.get_state(RoleListState)
+        await role_list_state.paginated_roles()
+
+    async def set_from_system(self, value: str):
+        self.from_system = value
+        role_list_state = await self.get_state(RoleListState)
+        await role_list_state.paginated_roles()
+
+    async def set_version(self, value: str):
+        self.version = value
+        role_list_state = await self.get_state(RoleListState)
+        await role_list_state.paginated_roles()
+
+    async def set_active(self, value: str):
+        self.active = value
+        role_list_state = await self.get_state(RoleListState)
+        await role_list_state.paginated_roles()
+
+    async def set_customized(self, value: str):
+        self.customized = value
         role_list_state = await self.get_state(RoleListState)
         await role_list_state.paginated_roles()
 
@@ -177,6 +208,10 @@ class RoleListState(rx.State):
         roles = role_services.get_roles(
             access_token=auth_state.access_token,
             search=filter_state.search,
+            from_system=filter_state.from_system,
+            version=filter_state.version,
+            customized=filter_state.customized,
+            active=filter_state.active,
             page=self.page,
             per_page=self.per_page
         )

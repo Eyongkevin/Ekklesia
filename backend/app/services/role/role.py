@@ -14,6 +14,17 @@ class RoleService:
         self.uow = uow
         self.role_crud = RoleCRUD(self.uow.db)
 
+    def __resolve_filter(self, item: str) -> bool | int | None:
+        if item == "True":
+            return True
+        elif item == "False":
+            return False
+        try:
+            return int(item)
+        except ValueError:
+            pass
+
+
     def create_bulk_from_system(self, church_id: str, roles: list[SystemRole]) -> list[Role]:
         created_roles: list[Role] = []
 
@@ -53,9 +64,27 @@ class RoleService:
     def get_all_roles(self, church_id: str, is_active: bool = True) -> list[Role]:
         return self.role_crud.get_all_roles(church_id, is_active)
 
+    def get_unique_template_versions(self):
+        all_versions: list[int] = []
+        versions =  self.role_crud.get_unique_template_versions()
+
+        for (version, )  in versions:
+            if version is not None:
+                all_versions.append(version)
+        return all_versions
+
     def get_roles(self, church_id: str, filters: role_schemas.RoleFilterOptions, is_active:bool = True) -> list[Role]:
         offset = (filters.page - 1) * filters.per_page
-        return self.role_crud.get_roles(church_id, is_active, search=filters.search, offset=offset, limit=filters.per_page)
+        return self.role_crud.get_roles(
+            church_id, 
+            is_active, 
+            search=filters.search,
+            from_system=self.__resolve_filter(filters.from_system),
+            version=self.__resolve_filter(filters.version),
+            # active=filters.active,
+            customized = self.__resolve_filter(filters.customized),
+            offset=offset, 
+            limit=filters.per_page)
 
     def update(self, role_id: str, role: role_schemas.RoleReq)-> Role:
         existing_role: Role | None = self.role_crud.get_by_id(role_id)

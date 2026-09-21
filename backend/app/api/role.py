@@ -25,6 +25,10 @@ def get_all_roles(
     ):
     return role_services.RoleService(uow).get_all_roles(church_id=user.memberships[0].church_id)
 
+@router.get("/template_versions/")
+def get_unique_template_versions(uow: UnitOfWork = Depends(deps.get_db)):
+    return role_services.RoleService(uow).get_unique_template_versions()
+
 @router.get("/", response_model=role_schemas.RoleListRes, status_code=http_status.HTTP_200_OK)
 def get_roles(
     user: User = Depends(deps.get_user),

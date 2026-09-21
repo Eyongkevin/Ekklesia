@@ -44,9 +44,27 @@ def create(
     response.raise_for_status()
     return response.json()
 
-def get_roles(access_token: str, search: str, page: int=1, per_page: int = 10) -> list[dict]:
+def get_template_versions():
+    response = httpx.get(f"{settings.BASE_URL}/roles/template_versions/")
+    response.raise_for_status()
+    return response.json()
+
+
+def get_roles(
+        access_token: str, 
+        search: str,
+        from_system: str,
+        version: str,
+        active: str,
+        customized: str,
+        page: int=1, 
+        per_page: int = 10) -> list[dict]:
     params = {
         'search': search,
+        "from_system": from_system,
+        "version": version,
+        "active": active,
+        "customized": customized,
         'page': page,
         'per_page': per_page
     }

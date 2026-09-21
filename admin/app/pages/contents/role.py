@@ -88,6 +88,38 @@ def role_actions():
 def role_filters():
     return rx.box(
         rx.flex(
+            rx.hstack(
+                rx.text("From System"),
+                rx.select(
+                    ["All", "True", "False"],
+                    value=role_states.RoleFilterState.from_system,
+                    on_change=role_states.RoleFilterState.set_from_system,
+                ),
+            ),
+            rx.hstack(
+                rx.text("Version"),
+                rx.select(
+                    role_states.RoleState.get_template_versions,
+                    value=role_states.RoleFilterState.version,
+                    on_change=role_states.RoleFilterState.set_version,
+                ),
+            ),
+            rx.hstack(
+                rx.text("Active"),
+                rx.select(
+                    ["All", "True", "False"],
+                    value=role_states.RoleFilterState.active,
+                    on_change=role_states.RoleFilterState.set_active,
+                ),
+            ),
+            rx.hstack(
+                rx.text("Customized"),
+                rx.select(
+                    ["All", "True", "False"],
+                    value=role_states.RoleFilterState.customized,
+                    on_change=role_states.RoleFilterState.set_customized,
+                ),
+            ),
             rx.input(
                 placeholder="🔍 Search roles...",
                 value=role_states.RoleFilterState.search,
