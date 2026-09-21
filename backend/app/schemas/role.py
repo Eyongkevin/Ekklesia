@@ -59,15 +59,18 @@ class RoleAllRes(BaseModel):
 
 class RoleFilterOptions(BaseModel):
     search: str
-    from_system: str
-    version: str
-    active: str
-    customized: str
+    from_system: str = "all"
+    version: str = "all"
+    active: str = "all"
+    customized: str = "all"
     page: int = 1
     per_page: int = 10
 
 class RoleUpdate(RoleBase):
     permissions: list[str]
+
+class RoleStatusUpdate(BaseModel):
+    is_active: bool
 
 class RoleMerge(BaseModel):
     target_role_name: str

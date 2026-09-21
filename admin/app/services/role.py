@@ -103,3 +103,13 @@ def delete_role(access_token: str, role_id: str) -> None:
                     "Authorization": f"Bearer {access_token}"
                 })
     response.raise_for_status()
+
+def update_state(access_token: str, role_id: str, state: bool) ->dict:
+    body = {
+        "is_active": state
+    }
+    response = httpx.patch(f"{settings.BASE_URL}/roles/{role_id}/state/", json=body, headers={
+                        "Authorization": f"Bearer {access_token}"
+                    })
+    response.raise_for_status()
+    return response.json()

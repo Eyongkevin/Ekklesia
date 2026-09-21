@@ -47,7 +47,7 @@ class RoleCRUD:
     def get_roles(
             self, 
             church_id: str, 
-            is_active:bool, 
+            is_active:Optional[bool], 
             search: str,
             from_system: Optional[bool],
             version: Optional[int],
@@ -55,8 +55,10 @@ class RoleCRUD:
             customized: Optional[bool],
             offset: int=0, 
             limit: int=10) -> dict[str, int | list[Role]]:
-        query = self.db.query(Role).filter(Role.church_id==church_id, Role.is_active==is_active)
+        query = self.db.query(Role).filter(Role.church_id==church_id)
 
+        if is_active is not None:
+            query = query.filter(Role.is_active == is_active)
         if search:
             query = query.filter(Role.name.ilike(f'%{search}%'))
         if from_system is not None:
