@@ -286,6 +286,23 @@ class RoleListState(rx.State):
             # error = ex.response.json()
             # yield rx.toast.error(error.get("detail", "Error deleting role"))
 
+    @rx.event
+    async def update_role_state(self, role: RoleType):
+        from app.states.auth import AuthState
+        auth_state = await self.get_state(AuthState)
+
+        try:
+            role_services.update_state(
+                access_token=auth_state.access_token,
+                role_id=role["id"],
+                state= not role["is_active"],
+            )
+            role_list_state = await self.get_state(RoleListState)
+            await role_list_state.paginated_roles()
+        except Exception as ex:
+            yield rx.toast.error(f"Error updating role state: {ex}")
+
+
     # @rx.event
     # async def merge_role(self):
     #     from app.states.auth import AuthState

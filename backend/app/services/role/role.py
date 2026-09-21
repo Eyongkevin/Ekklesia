@@ -86,6 +86,19 @@ class RoleService:
             offset=offset, 
             limit=filters.per_page)
 
+
+    def update_state(self, role_id: str, state: role_schemas.RoleStatusUpdate) -> Role:
+        role: Role | None = self.role_crud.get_by_id(role_id)
+
+        if not role:
+            raise role_exceptions.RoleNotFound
+
+        role.is_active = state.is_active
+        self.uow.commit()
+
+        return role
+
+
     def update(self, role_id: str, role: role_schemas.RoleReq)-> Role:
         existing_role: Role | None = self.role_crud.get_by_id(role_id)
 

@@ -37,6 +37,15 @@ def get_roles(
     ):
     return role_services.RoleService(uow).get_roles(church_id=user.memberships[0].church_id, filters=filters)
 
+@router.patch("/{role_id}/state/", response_model=role_schemas.RoleRes)
+def update_state(
+    role_id: str,
+    state: role_schemas.RoleStatusUpdate,
+    _: User = Depends(deps.get_user),
+    uow: UnitOfWork = Depends(deps.get_db)
+    ):
+    return role_services.RoleService(uow).update_state(role_id, state)
+
 @router.patch("/{role_id}/", response_model=role_schemas.RoleRes, status_code=http_status.HTTP_200_OK)
 def update(
     role_id: str,

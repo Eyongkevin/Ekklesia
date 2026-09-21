@@ -463,8 +463,12 @@ def role_actions_menu(role):
                 ),
             ),
             rx.menu.item(
-                "Activate",
-                # on_click=lambda: AnnouncementListState.update_announcement(announcement),
+                rx.cond(
+                    role["is_active"],
+                    "Deactivate",
+                    "Activate"
+                ),
+                on_click=lambda: role_states.RoleListState.update_role_state(role),
             ),
             rx.menu.separator(),
             rx.cond(
