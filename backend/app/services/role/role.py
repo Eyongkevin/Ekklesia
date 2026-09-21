@@ -73,11 +73,11 @@ class RoleService:
                 all_versions.append(version)
         return all_versions
 
-    def get_roles(self, church_id: str, filters: role_schemas.RoleFilterOptions, is_active:bool = True) -> list[Role]:
+    def get_roles(self, church_id: str, filters: role_schemas.RoleFilterOptions) -> list[Role]:
         offset = (filters.page - 1) * filters.per_page
         return self.role_crud.get_roles(
             church_id, 
-            is_active, 
+            is_active = self.__resolve_filter(filters.active), 
             search=filters.search,
             from_system=self.__resolve_filter(filters.from_system),
             version=self.__resolve_filter(filters.version),
