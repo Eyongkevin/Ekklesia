@@ -18,6 +18,45 @@ class UserCRUD:
     def get_user_by_id(self, user_id: str) -> User | None:
         return self.db.query(User).filter_by(id=user_id).scalar()
 
+    def get_admin_users_by_church(
+            self, 
+            church_id: str,
+            offset: int = 0,
+            limit: int = 10
+            ) -> dict[str, int | list[User]]:
+
+            query = (
+                self.db.query(User)
+                .join(User.memberships)
+                .join(Membership.roles)
+                .where(
+                    Membership.church_id == church_id,
+                    User.telegram_id.is_(None),
+                    User.email.is_not(None)
+                    )
+            )
+
+            # query = (
+            #     select(User)
+            #     .join(User.memberships)
+            #     .where(
+            #         Membership.church_id == church_id,
+            #         User.telegram_id.is_(None),
+            #         User.email.is_not(None)
+            #         )
+            # )
+            total = query.count()
+            admins = (query
+                    .order_by(User.created_at.desc())
+                    .offset(offset)
+                    .limit(limit)
+                    .all())
+            return {
+                'admins': admins,
+                'total': total
+            }
+
+
     def create_user(
         self,
         telegram_id: str | None = None, 

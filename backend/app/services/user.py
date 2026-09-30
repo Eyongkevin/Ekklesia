@@ -4,6 +4,7 @@ from app.services.membership import MembershipService
 from app.repositories.user import UserCRUD
 from app.services.invite import InviteService
 from app.models import User
+from app.schemas import user as user_schemas
 from app.db.uow import UnitOfWork
 from app.core.utils import verify_password
 
@@ -68,6 +69,10 @@ class UserService:
     def get_users_by_role(self, role_id: str) -> list[User]:
         return self.user_crud.get_users_by_role(role_id)
 
+    def get_admin_users_by_church(self, church_id: str, filters: user_schemas.UserAdminFilterOptions) -> dict[str, int | list[User]]:
+        offset = (filters.page - 1) * filters.per_page
+        return self.user_crud.get_admin_users_by_church(church_id, offset=offset, limit=filters.per_page)
+    
     def has_role(self, user_id: str, role_id: str) -> bool:
         return self.user_crud.has_role(user_id, role_id)
 

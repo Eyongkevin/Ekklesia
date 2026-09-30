@@ -29,7 +29,9 @@ def dashboard_sidebar():
 
         rx.text("User Management", weight="bold"),
 
+        sidebar_item("Users", "user-star", "users"),
         sidebar_item("Roles", "user-key", "roles"),
+        
 
         width="250px",
         height="100%",
