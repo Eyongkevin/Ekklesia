@@ -15,9 +15,12 @@ class UserAdmin(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     is_active: bool = True
+    created_by: Optional["UserAdmin"] = None
     memberships: list[membership_base_schemas.Membership]
     created_at: datetime
     modified_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 class UserAdminListRes(BaseModel):
     total: int

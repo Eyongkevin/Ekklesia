@@ -1,4 +1,5 @@
 from typing import Optional
+import uuid
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select, or_
@@ -69,16 +70,18 @@ class UserCRUD:
 
     def create_user(
         self,
-        telegram_id: str | None = None, 
-        first_name: str | None = None, 
-        email: str | None = None, 
-        password: str | None = None
+        telegram_id: str | None = None,
+        first_name: str | None = None,
+        email: str | None = None,
+        password: str | None = None,
+        created_by_id: uuid.UUID | None = None
     ) -> User:
         new_user = User(
             telegram_id=telegram_id,
             first_name=first_name,
             email=email,
-            password_hash=password
+            password_hash=password,
+            created_by_id=created_by_id
         )
         self.db.add(new_user)
 

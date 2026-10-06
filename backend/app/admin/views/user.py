@@ -1,8 +1,10 @@
 from operator import or_
+from uuid import UUID
 
 from sqladmin import ModelView
 from sqlalchemy.orm import joinedload
 from sqladmin.filters import BooleanFilter
+from starlette.requests import Request
 from wtforms import PasswordField
 from wtforms.validators import DataRequired, Optional
 
@@ -87,8 +89,17 @@ class UserAdmin(ModelView, model=User):
 
         return form_class
 
-    async def on_model_change(self, form: dict[str, str | bool], model, is_created, *args, **kwargs) -> None:
-        """Override on_model_change to handle password hashing."""
+    async def on_model_change(
+        self,
+        form: dict[str, str | bool],
+        model: User,
+        is_created: bool,
+        request: Request,
+    ) -> None:
+        """Set the creator for new users and handle password hashing."""
+
+        if is_created:
+            model.created_by_id = UUID(request.session["user_id"])
 
         password: str = form["password"]
 

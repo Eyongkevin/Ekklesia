@@ -52,3 +52,12 @@ def get_expire_at(expire_date: str, expire_time: str):
         f"{expire_date} {expire_time}", 
         "%Y-%m-%d %H:%M"
     )
+
+def format_created_by(created_by: dict | None):
+    if not created_by:
+        return "-"
+
+    first_name: str = created_by.get("first_name") or ""
+    last_name: str = created_by.get("last_name") or ""
+
+    return f"{first_name} {last_name}".strip() or "-"

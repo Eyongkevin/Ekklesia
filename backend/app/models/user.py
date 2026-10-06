@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, func, CheckConstraint, text, Index
+from sqlalchemy import String, DateTime, func, CheckConstraint, text, Index, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -47,6 +47,12 @@ class User(Base):
         default=True, server_default=text("true")
     )
 
+    created_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now()
@@ -60,6 +66,11 @@ class User(Base):
 
     # cascade="all, delete-orphan"
     memberships = relationship("Membership", back_populates="user", passive_deletes="all")
+    created_by: Mapped["User | None"] = relationship(
+        "User",
+        remote_side=[id],
+        foreign_keys=[created_by_id]
+    )
 
     __table_args__ = (
         Index(

@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+import uuid
 
 from app.services.membership import MembershipService
 from app.repositories.user import UserCRUD
@@ -22,9 +23,12 @@ class UserService:
         telegram_id: str | None = None, 
         first_name: str | None = None, 
         email: str | None = None, 
-        password: str | None = None
+        password: str | None = None,
+        created_by_id: str | None = None
     ) -> User:
-        user = self.user_crud.create_user(telegram_id, first_name, email, password)
+        created_by_id_: uuid.UUID | None = uuid.UUID(created_by_id) if created_by_id else None
+
+        user = self.user_crud.create_user(telegram_id, first_name, email, password, created_by_id_)
         self.uow.commit()
         return user
 

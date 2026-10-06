@@ -3,6 +3,8 @@ from datetime import datetime
 from  app.services import users as user_services
 import reflex as rx
 
+from app.utils import format_created_by
+
 
 class UserAdminType(TypedDict):
     id: str
@@ -10,6 +12,8 @@ class UserAdminType(TypedDict):
     first_name: str
     last_name: Optional[str]
     is_active: bool
+    created_by: Optional["UserAdminType"]
+    created_by_name: str
     memberships: list[dict[str, list[dict[str, str]]]]
     created_at: datetime
     modified_at: datetime
@@ -37,7 +41,14 @@ class UserAdminListState(rx.State):
         )
 
         self.total_pages = admins.get('total', 0) // self.per_page + 1
-        self.admins = admins.get('admins', [])
+        self.admins = [
+            {
+                **admin,
+                "created_by_name": format_created_by(admin.get("created_by"))
+
+            }
+            for admin in admins.get('admins', [])
+        ]
 
 class UserAdminFilterState(rx.State):
     search: str = ""

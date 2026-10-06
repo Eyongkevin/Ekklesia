@@ -5,7 +5,7 @@ from app.pages.components.form_label import form_label
 from app.pages.components.list_components import status_icon
 
 from app.states import permission as permission_states
-from app.utils import get_short_desc
+from app.utils import get_short_desc, format_created_by
 from app.pages.components.view_announcement import section_title, info_item
 from app.pages.components.role import delete_confirmation_modal
 
@@ -238,7 +238,7 @@ def admin_row(admin):
         # 📅 Created By
         rx.box(
             rx.text(
-                "Kevin Enow",
+                admin["created_by_name"],
                 font_size="13px",
             ),
             width="20%",
