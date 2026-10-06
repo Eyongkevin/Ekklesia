@@ -14,7 +14,6 @@ class UserAdminType(TypedDict):
     created_at: datetime
     modified_at: datetime
 
-
 class UserAdminListState(rx.State):
     admins: list[UserAdminType] = []
 
@@ -26,12 +25,36 @@ class UserAdminListState(rx.State):
         from app.states.auth import AuthState
 
         auth_state = await self.get_state(AuthState)
+        filter_state = await self.get_state(UserAdminFilterState)
 
         admins = user_services.get_admin_users(
             access_token=auth_state.access_token,
+            search=filter_state.search,
+            is_active=filter_state.is_active,
+            role=filter_state.role,
             page=self.page,
             per_page=self.per_page
         )
 
         self.total_pages = admins.get('total', 0) // self.per_page + 1
         self.admins = admins.get('admins', [])
+
+class UserAdminFilterState(rx.State):
+    search: str = ""
+    is_active: str = "All"
+    role: str = "All"
+
+    async def set_search(self, value: str):
+        self.search = value
+        admin_list_state = await self.get_state(UserAdminListState)
+        await admin_list_state.paginated_admins()
+
+    async def set_is_active(self, value: str):
+        self.is_active = value
+        admin_list_state = await self.get_state(UserAdminListState)
+        await admin_list_state.paginated_admins()
+
+    async def set_role(self, value: str):
+        self.role = value
+        admin_list_state = await self.get_state(UserAdminListState)
+        await admin_list_state.paginated_admins()

@@ -36,6 +36,9 @@ class UserAdminListRes(BaseModel):
     admins: list[UserAdmin]
 
 class UserAdminFilterOptions(BaseModel):
+    search: str = ""
+    is_active: str = "All"
+    role: str = "All"
     page: int = 1
     per_page: int = 10
 

@@ -7,6 +7,7 @@ from app.models import User
 from app.schemas import user as user_schemas
 from app.db.uow import UnitOfWork
 from app.core.utils import verify_password
+from app.services import utils
 
 
 class UserService:
@@ -71,7 +72,13 @@ class UserService:
 
     def get_admin_users_by_church(self, church_id: str, filters: user_schemas.UserAdminFilterOptions) -> dict[str, int | list[User]]:
         offset = (filters.page - 1) * filters.per_page
-        return self.user_crud.get_admin_users_by_church(church_id, offset=offset, limit=filters.per_page)
+        return self.user_crud.get_admin_users_by_church(
+            church_id,
+            search=filters.search,
+            is_active=utils.resolve_filter(filters.is_active),
+            role=utils.resolve_filter(filters.role),
+            offset=offset,
+            limit=filters.per_page)
     
     def has_role(self, user_id: str, role_id: str) -> bool:
         return self.user_crud.has_role(user_id, role_id)

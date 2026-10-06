@@ -81,6 +81,13 @@ def get_all_roles(access_token: str) -> list[dict]:
     response.raise_for_status()
     return response.json()
 
+def get_role_names(access_token: str) -> list[dict]:
+    response = httpx.get(f"{settings.BASE_URL}/roles/names/", headers={
+                    "Authorization": f"Bearer {access_token}"
+                })
+    response.raise_for_status()
+    return response.json()
+
 def get_role_with_membership(access_token: str, role_id: str):
     response = httpx.get(f"{settings.BASE_URL}/roles/{role_id}/", headers={
             "Authorization": f"Bearer {access_token}"

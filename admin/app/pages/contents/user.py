@@ -1,5 +1,6 @@
 import reflex as rx
 from app.states import user as user_states
+from app.states import role as role_states
 from app.pages.components.form_label import form_label
 from app.pages.components.list_components import status_icon
 
@@ -89,25 +90,25 @@ def user_filters():
     return rx.box(
         rx.flex(
             rx.hstack(
-                rx.text("Status"),
+                rx.text("Active"),
                 rx.select(
-                    ["All", "Active", "Inactive"],
-                    # value=role_states.RoleFilterState.from_system,
-                    # on_change=role_states.RoleFilterState.set_from_system,
+                    ["All", "True", "False"],
+                    value=user_states.UserAdminFilterState.is_active,
+                    on_change=user_states.UserAdminFilterState.set_is_active
                 ),
             ),
             rx.hstack(
                 rx.text("Roles"),
                 rx.select(
-                    ["All", "Pastor", "Secretary", "Teacher"],
-                    # value=role_states.RoleFilterState.version,
-                    # on_change=role_states.RoleFilterState.set_version,
+                    role_states.RoleState.get_roles_name,
+                    value=user_states.UserAdminFilterState.role,
+                    on_change=user_states.UserAdminFilterState.set_role
                 ),
             ),
             rx.input(
                 placeholder="🔍 Search users...",
-                # value=role_states.RoleFilterState.search,
-                # on_change=role_states.RoleFilterState.set_search,
+                value=user_states.UserAdminFilterState.search,
+                on_change=user_states.UserAdminFilterState.set_search,
                 width="260px",
             ),
             justify="between",

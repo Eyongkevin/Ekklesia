@@ -1,5 +1,8 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, or_
+
 from app.models.user import User
 from app.models.membership import Membership
 from app.models.role import Role
@@ -21,6 +24,9 @@ class UserCRUD:
     def get_admin_users_by_church(
             self, 
             church_id: str,
+            search: str,
+            is_active: Optional[bool],
+            role: Optional[str],
             offset: int = 0,
             limit: int = 10
             ) -> dict[str, int | list[User]]:
@@ -35,16 +41,20 @@ class UserCRUD:
                     User.email.is_not(None)
                     )
             )
-
-            # query = (
-            #     select(User)
-            #     .join(User.memberships)
-            #     .where(
-            #         Membership.church_id == church_id,
-            #         User.telegram_id.is_(None),
-            #         User.email.is_not(None)
-            #         )
-            # )
+            if is_active is not None:
+                query = query.filter(User.is_active == is_active)
+            if search:
+                query = query.filter(
+                    or_(
+                        User.first_name.ilike(f"%{search}%"),
+                        User.last_name.ilike(f"%{search}%"),
+                        User.email.ilike(f"%{search}%"),
+                    )
+                )
+            if role is not None:
+                query = query.filter(
+                    Membership.roles.any(Role.name == role)
+                )
             total = query.count()
             admins = (query
                     .order_by(User.created_at.desc())
@@ -112,3 +122,5 @@ class UserCRUD:
         self.db.flush()
 
         return membership
+
+

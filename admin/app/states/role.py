@@ -21,6 +21,7 @@ class RoleType(TypedDict):
 
 class RoleState(rx.State):
     show_add_update_drawer: bool = False
+    role_names: list[str] = []
 
     @rx.var
     def get_template_versions(self) -> list[str]:
@@ -45,6 +46,18 @@ class RoleState(rx.State):
         
         role_form_state = await self.get_state(RoleFormState)
         role_form_state.reset_form()
+
+
+    async def fetch_roles_name(self):
+        from app.states.auth import AuthState
+
+        auth_state = await self.get_state(AuthState)
+
+        self.role_names = role_services.get_role_names(auth_state.access_token)
+
+    @rx.var
+    def get_roles_name(self) -> list[str]:
+        return ["All"] + self.role_names
 
 
 class RoleFilterState(rx.State):
