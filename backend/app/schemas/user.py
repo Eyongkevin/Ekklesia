@@ -1,7 +1,7 @@
 from typing import Optional
 import uuid
 from pydantic import BaseModel, ConfigDict
-
+from datetime import datetime
 class UserBase(BaseModel):
     telegram_id: Optional[str] = None
     first_name: Optional[str] = None
@@ -20,6 +20,27 @@ class User(UserBase):
     is_active: bool = True
 
     # model_config = ConfigDict(from_attributes=True)
+
+class UserAdmin(BaseModel):
+    id: uuid.UUID
+    email: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    is_active: bool = True
+
+    created_at: datetime
+    modified_at: datetime
+
+class UserAdminListRes(BaseModel):
+    total: int
+    admins: list[UserAdmin]
+
+class UserAdminFilterOptions(BaseModel):
+    search: str = ""
+    is_active: str = "All"
+    role: str = "All"
+    page: int = 1
+    per_page: int = 10
 
 class UserFirstName(BaseModel):
     first_name: Optional[str] = None

@@ -1,6 +1,7 @@
 """Welcome to Reflex! This file outlines the steps to create a basic app."""
 
 import reflex as rx
+from app.config import APP_NAME
 from app.pages.church import church_page
 # from app.pages.invite import invite_page
 from app.pages.login import login_page
@@ -37,5 +38,5 @@ app = rx.App()
 app.add_page(index)
 app.add_page(church_page, route="/churches", title="Church Management")
 # app.add_page(invite_page, route="/invites", title="Invite Management")
-app.add_page(login_page, route="/login", title="Ekklesia Login")
-app.add_page(dashboard_page, route='/dashboard', on_load=AuthState.check_auth, title='Ekklesia Dashboard')
+app.add_page(login_page, route="/login", title=f"{APP_NAME} Login")
+app.add_page(dashboard_page, route='/dashboard', on_load=AuthState.check_auth, title=f'{APP_NAME} Dashboard')

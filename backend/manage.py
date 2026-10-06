@@ -4,7 +4,7 @@ from app.db.uow import UnitOfWork
 from app.services.user import UserService
 from app.services.membership import MembershipService
 
-from app.core.utils import MembershipRole
+from app.core.utils import MembershipRole, UserCreationSource
 from app.core.utils import hash_password
 
 app = typer.Typer(help="Manage Ekklesia backend tasks")
@@ -76,7 +76,8 @@ def createsuperuser():
         # Create user
         user = user_service.create_user(
             email=email,
-            password=hash_password(password)
+            password=hash_password(password),
+            creation_source=UserCreationSource.BOOTSTRAP,
         )
 
         # Assign SUPER_ADMIN role

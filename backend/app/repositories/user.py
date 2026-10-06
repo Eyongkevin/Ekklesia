@@ -1,8 +1,13 @@
+from typing import Optional
+import uuid
+
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, or_
+
 from app.models.user import User
 from app.models.membership import Membership
 from app.models.role import Role
+from app.core.utils import UserCreationSource
 
 
 class UserCRUD:
@@ -18,18 +23,68 @@ class UserCRUD:
     def get_user_by_id(self, user_id: str) -> User | None:
         return self.db.query(User).filter_by(id=user_id).scalar()
 
+    def get_admin_users_by_church(
+            self, 
+            church_id: str,
+            search: str,
+            is_active: Optional[bool],
+            role: Optional[str],
+            offset: int = 0,
+            limit: int = 10
+            ) -> dict[str, int | list[User]]:
+
+            query = (
+                self.db.query(User)
+                .join(User.memberships)
+                .join(Membership.roles)
+                .where(
+                    Membership.church_id == church_id,
+                    User.telegram_id.is_(None),
+                    User.email.is_not(None)
+                    )
+            )
+            if is_active is not None:
+                query = query.filter(User.is_active == is_active)
+            if search:
+                query = query.filter(
+                    or_(
+                        User.first_name.ilike(f"%{search}%"),
+                        User.last_name.ilike(f"%{search}%"),
+                        User.email.ilike(f"%{search}%"),
+                    )
+                )
+            if role is not None:
+                query = query.filter(
+                    Membership.roles.any(Role.name == role)
+                )
+            total = query.count()
+            admins = (query
+                    .order_by(User.created_at.desc())
+                    .offset(offset)
+                    .limit(limit)
+                    .all())
+            return {
+                'admins': admins,
+                'total': total
+            }
+
+
     def create_user(
         self,
-        telegram_id: str | None = None, 
-        first_name: str | None = None, 
-        email: str | None = None, 
-        password: str | None = None
+        creation_source: UserCreationSource,
+        telegram_id: str | None = None,
+        first_name: str | None = None,
+        email: str | None = None,
+        password: str | None = None,
+        created_by_id: uuid.UUID | None = None,
     ) -> User:
         new_user = User(
             telegram_id=telegram_id,
             first_name=first_name,
             email=email,
-            password_hash=password
+            password_hash=password,
+            created_by_id=created_by_id,
+            creation_source=creation_source
         )
         self.db.add(new_user)
 
@@ -73,3 +128,5 @@ class UserCRUD:
         self.db.flush()
 
         return membership
+
+

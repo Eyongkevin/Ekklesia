@@ -64,6 +64,10 @@ class RoleService:
     def get_all_roles(self, church_id: str, is_active: bool = True) -> list[Role]:
         return self.role_crud.get_all_roles(church_id, is_active)
 
+    def get_roles_name(self, church_id: str, is_active: bool = True) -> list[str]:
+        roles = self.get_all_roles(church_id, is_active)
+        return [role.name for role in roles]
+
     def get_unique_template_versions(self):
         all_versions: list[int] = []
         versions =  self.role_crud.get_unique_template_versions()

@@ -1,11 +1,14 @@
 from fastapi import HTTPException, status
+import uuid
 
 from app.services.membership import MembershipService
 from app.repositories.user import UserCRUD
 from app.services.invite import InviteService
 from app.models import User
+from app.schemas import user as user_schemas
 from app.db.uow import UnitOfWork
-from app.core.utils import verify_password
+from app.core.utils import UserCreationSource, verify_password
+from app.services import utils
 
 
 class UserService:
@@ -20,9 +23,20 @@ class UserService:
         telegram_id: str | None = None, 
         first_name: str | None = None, 
         email: str | None = None, 
-        password: str | None = None
+        password: str | None = None,
+        created_by_id: str | None = None,
+        creation_source: UserCreationSource = UserCreationSource.WEB_APP,
     ) -> User:
-        user = self.user_crud.create_user(telegram_id, first_name, email, password)
+        created_by_id_: uuid.UUID | None = uuid.UUID(created_by_id) if created_by_id else None
+
+        user = self.user_crud.create_user(
+            creation_source=creation_source,
+            telegram_id=telegram_id,
+            first_name=first_name,
+            email=email,
+            password=password,
+            created_by_id=created_by_id_,
+        )
         self.uow.commit()
         return user
 
@@ -40,7 +54,11 @@ class UserService:
         #   If user exists, raise an error
         user = self.user_crud.get_user_by_telegram_id(telegram_id)
         if user is None:
-            user = self.user_crud.create_user(telegram_id, first_name)
+            user = self.user_crud.create_user(
+                creation_source=UserCreationSource.WEB_APP,
+                telegram_id=telegram_id,
+                first_name=first_name,
+            )
 
         # Check if membership already exists
         if self.membership_service.check_membership(str(user.id), str(invite.church_id)) is False:
@@ -68,6 +86,16 @@ class UserService:
     def get_users_by_role(self, role_id: str) -> list[User]:
         return self.user_crud.get_users_by_role(role_id)
 
+    def get_admin_users_by_church(self, church_id: str, filters: user_schemas.UserAdminFilterOptions) -> dict[str, int | list[User]]:
+        offset = (filters.page - 1) * filters.per_page
+        return self.user_crud.get_admin_users_by_church(
+            church_id,
+            search=filters.search,
+            is_active=utils.resolve_filter(filters.is_active),
+            role=utils.resolve_filter(filters.role),
+            offset=offset,
+            limit=filters.per_page)
+    
     def has_role(self, user_id: str, role_id: str) -> bool:
         return self.user_crud.has_role(user_id, role_id)
 

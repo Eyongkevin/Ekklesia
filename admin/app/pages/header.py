@@ -1,4 +1,5 @@
 import reflex as rx
+from app.config import APP_NAME
 
 from app.states.auth import AuthState
 
@@ -6,7 +7,7 @@ def dashboard_header():
     return rx.hstack(
         rx.hstack(
             rx.image(src="/logo.png", width="40px", height="40px"),
-            rx.heading("Ekklesia", size="4"),
+            rx.heading(APP_NAME, size="4"),
             align="center",
             spacing="2",
         ),

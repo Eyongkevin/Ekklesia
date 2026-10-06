@@ -1,14 +1,16 @@
 from operator import or_
+from uuid import UUID
 
 from sqladmin import ModelView
 from sqlalchemy.orm import joinedload
 from sqladmin.filters import BooleanFilter
+from starlette.requests import Request
 from wtforms import PasswordField
 from wtforms.validators import DataRequired, Optional
 
 from app.models import User
 from app.models import Membership
-from app.core.utils import hash_password
+from app.core.utils import UserCreationSource, hash_password
 
 def get_church(user) -> str:
     if user.memberships:
@@ -87,8 +89,18 @@ class UserAdmin(ModelView, model=User):
 
         return form_class
 
-    async def on_model_change(self, form: dict[str, str | bool], model, is_created, *args, **kwargs) -> None:
-        """Override on_model_change to handle password hashing."""
+    async def on_model_change(
+        self,
+        form: dict[str, str | bool],
+        model: User,
+        is_created: bool,
+        request: Request,
+    ) -> None:
+        """Set the creator and source for new users and handle password hashing."""
+
+        if is_created:
+            model.created_by_id = UUID(request.session["user_id"])
+            model.creation_source = UserCreationSource.SQLADMIN
 
         password: str = form["password"]
 
