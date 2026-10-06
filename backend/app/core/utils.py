@@ -113,4 +113,7 @@ def format_expire_in(expire_date: datetime | None) -> str:
 
         return f"({expire_in})"
         
-
+class UserCreationSource(str, Enum):
+    WEB_APP = "web_app"
+    SQLADMIN = "sqladmin"
+    BOOTSTRAP= "bootstrap"

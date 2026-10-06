@@ -1,6 +1,7 @@
 from typing import Optional
 import uuid
 from pydantic import BaseModel, ConfigDict
+from app.core.utils import UserCreationSource
 from app.schemas import membership_base as membership_base_schemas
 from datetime import datetime
 
@@ -16,6 +17,7 @@ class UserAdmin(BaseModel):
     last_name: Optional[str] = None
     is_active: bool = True
     created_by: Optional["UserAdmin"] = None
+    creation_source: UserCreationSource
     memberships: list[membership_base_schemas.Membership]
     created_at: datetime
     modified_at: datetime

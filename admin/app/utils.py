@@ -53,11 +53,12 @@ def get_expire_at(expire_date: str, expire_time: str):
         "%Y-%m-%d %H:%M"
     )
 
-def format_created_by(created_by: dict | None):
-    if not created_by:
-        return "-"
-
+def format_created_by(created_by: dict | None, creation_source: str | None) -> str:
+    created_by = created_by or {}
     first_name: str = created_by.get("first_name") or ""
     last_name: str = created_by.get("last_name") or ""
 
-    return f"{first_name} {last_name}".strip() or "-"
+    name = f"{first_name} {last_name}".strip()
+    if creation_source in {"sqladmin", "bootstrap"}:
+        return name
+    return name or "-"

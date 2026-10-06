@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, Optional
 
 from app.models import User
 from app.models import Membership
-from app.core.utils import hash_password
+from app.core.utils import UserCreationSource, hash_password
 
 def get_church(user) -> str:
     if user.memberships:
@@ -96,10 +96,11 @@ class UserAdmin(ModelView, model=User):
         is_created: bool,
         request: Request,
     ) -> None:
-        """Set the creator for new users and handle password hashing."""
+        """Set the creator and source for new users and handle password hashing."""
 
         if is_created:
             model.created_by_id = UUID(request.session["user_id"])
+            model.creation_source = UserCreationSource.SQLADMIN
 
         password: str = form["password"]
 

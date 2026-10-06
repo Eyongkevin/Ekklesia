@@ -13,6 +13,7 @@ class UserAdminType(TypedDict):
     last_name: Optional[str]
     is_active: bool
     created_by: Optional["UserAdminType"]
+    creation_source: str
     created_by_name: str
     memberships: list[dict[str, list[dict[str, str]]]]
     created_at: datetime
@@ -44,7 +45,9 @@ class UserAdminListState(rx.State):
         self.admins = [
             {
                 **admin,
-                "created_by_name": format_created_by(admin.get("created_by"))
+                "created_by_name": format_created_by(
+                    admin.get("created_by"), admin.get("creation_source")
+                )
 
             }
             for admin in admins.get('admins', [])

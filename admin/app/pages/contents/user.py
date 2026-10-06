@@ -1,4 +1,5 @@
 import reflex as rx
+from app.config import APP_NAME
 from app.states import user as user_states
 from app.states import role as role_states
 from app.pages.components.form_label import form_label
@@ -237,9 +238,31 @@ def admin_row(admin):
         
         # 📅 Created By
         rx.box(
-            rx.text(
-                admin["created_by_name"],
-                font_size="13px",
+            rx.flex(
+                rx.cond(
+                    admin["created_by_name"] != "",
+                    rx.text(admin["created_by_name"], font_size="13px"),
+                ),
+                rx.cond(
+                    (admin["creation_source"] == "sqladmin")
+                    | (admin["creation_source"] == "bootstrap"),
+                    rx.tooltip(
+                        rx.box(
+                            rx.icon("shield-check", size=16, color="#6c5ce7"),
+                            aria_label=f"{APP_NAME} Admin",
+                            role="img",
+                            tab_index=0,
+                            display="inline-flex",
+                            padding="4px",
+                            background="#ece9ff",
+                            border_radius="6px",
+                        ),
+                        content=f"{APP_NAME} Admin",
+                    ),
+                ),
+                align="center",
+                wrap="wrap",
+                spacing="2",
             ),
             width="20%",
         ),

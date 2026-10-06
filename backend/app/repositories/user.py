@@ -7,6 +7,7 @@ from sqlalchemy import select, or_
 from app.models.user import User
 from app.models.membership import Membership
 from app.models.role import Role
+from app.core.utils import UserCreationSource
 
 
 class UserCRUD:
@@ -70,18 +71,20 @@ class UserCRUD:
 
     def create_user(
         self,
+        creation_source: UserCreationSource,
         telegram_id: str | None = None,
         first_name: str | None = None,
         email: str | None = None,
         password: str | None = None,
-        created_by_id: uuid.UUID | None = None
+        created_by_id: uuid.UUID | None = None,
     ) -> User:
         new_user = User(
             telegram_id=telegram_id,
             first_name=first_name,
             email=email,
             password_hash=password,
-            created_by_id=created_by_id
+            created_by_id=created_by_id,
+            creation_source=creation_source
         )
         self.db.add(new_user)
 

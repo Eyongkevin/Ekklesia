@@ -1,11 +1,12 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, func, CheckConstraint, text, Index, ForeignKey
+from sqlalchemy import String, DateTime, func, CheckConstraint, text, Index, ForeignKey, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.core.utils import UserCreationSource
 
 
 class User(Base):
@@ -51,6 +52,20 @@ class User(Base):
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True
+    )
+
+    creation_source: Mapped[UserCreationSource] = mapped_column(
+        Enum(
+            UserCreationSource,
+            name="user_creation_source",
+            #! store web_app, sqladmin, bootstrap rather than WEB_APP, SQLADMIN, BOOTSTRAP
+            values_callable=lambda enum_cls: [
+                item.value for item in enum_cls
+            ],
+        ),
+        nullable=False,
+        default=UserCreationSource.WEB_APP,
+        server_default=UserCreationSource.WEB_APP.value
     )
 
     created_at: Mapped[datetime] = mapped_column(

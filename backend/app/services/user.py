@@ -7,7 +7,7 @@ from app.services.invite import InviteService
 from app.models import User
 from app.schemas import user as user_schemas
 from app.db.uow import UnitOfWork
-from app.core.utils import verify_password
+from app.core.utils import UserCreationSource, verify_password
 from app.services import utils
 
 
@@ -24,11 +24,19 @@ class UserService:
         first_name: str | None = None, 
         email: str | None = None, 
         password: str | None = None,
-        created_by_id: str | None = None
+        created_by_id: str | None = None,
+        creation_source: UserCreationSource = UserCreationSource.WEB_APP,
     ) -> User:
         created_by_id_: uuid.UUID | None = uuid.UUID(created_by_id) if created_by_id else None
 
-        user = self.user_crud.create_user(telegram_id, first_name, email, password, created_by_id_)
+        user = self.user_crud.create_user(
+            creation_source=creation_source,
+            telegram_id=telegram_id,
+            first_name=first_name,
+            email=email,
+            password=password,
+            created_by_id=created_by_id_,
+        )
         self.uow.commit()
         return user
 
@@ -46,7 +54,11 @@ class UserService:
         #   If user exists, raise an error
         user = self.user_crud.get_user_by_telegram_id(telegram_id)
         if user is None:
-            user = self.user_crud.create_user(telegram_id, first_name)
+            user = self.user_crud.create_user(
+                creation_source=UserCreationSource.WEB_APP,
+                telegram_id=telegram_id,
+                first_name=first_name,
+            )
 
         # Check if membership already exists
         if self.membership_service.check_membership(str(user.id), str(invite.church_id)) is False:
